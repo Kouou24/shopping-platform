@@ -1,15 +1,64 @@
-<html>
-    <head>
-        <link rel = "stylesheet" href= "../CSS/style.css">
-    </head>
-    <body>
-        <h1>優惠券</h1>
-        <div class="nav">
-            <a href="home.html">首頁</a>
-            <a href="shop.html">商場</a>
-            <a href="activity.html">活動</a>
-            <a href="coupon.html">優惠券</a>
-            <a href="clientservice.html">客戶服務</a>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>優惠券專區</title>
+    <link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+    <!-- 頁首區域 -->
+    <div class="header">
+        <div class="logo">JB購物</div>
+        <div class="user-options">
+            <a href="#">註冊</a>
+            <a href="#">登入</a>
+            <a href="#"><img src="https://via.placeholder.com/24" alt="購物車"></a>
         </div>
-    </body>
+    </div>
+    <div class="nav">
+        <a href="home.html">首頁</a>
+        <a href="shop.html">商場</a>
+        <a href="activity.html">活動</a>
+        <a href="coupon.html">優惠券</a>
+        <a href="clientservice.html">客戶服務</a>
+    </div>
+
+    <!-- 主標題 -->
+    <h2>優惠券專區</h2>
+
+    <!-- 篩選區域 -->
+    <div class="coupon-filters">
+        <h3>篩選優惠券</h3>
+        <button onclick="filterCoupons('all')">全部</button>
+        <button onclick="filterCoupons('discount')">折扣券</button>
+        <button onclick="filterCoupons('freeshipping')">免運費券</button>
+    </div>
+
+    <!-- 優惠券列表區域 -->
+    <div class="coupon-list">
+        <div class="coupon-item" data-type="discount">
+            <h4>折扣券 - 9折</h4>
+            <p>使用此券可享9折優惠，適用於全站商品。</p>
+            <p>有效期限：2024/12/31</p>
+            <button>領取優惠券</button>
+        </div>
+        
+        <div class="coupon-item" data-type="freeshipping">
+            <h4>免運費券</h4>
+            <p>使用此券可免除運費，無最低消費限制。</p>
+            <p>有效期限：2024/11/30</p>
+            <button>領取優惠券</button>
+        </div>
+
+        <div class="coupon-item" data-type="discount">
+            <h4>折扣券 - 8折</h4>
+            <p>使用此券可享8折優惠，適用於指定商品。</p>
+            <p>有效期限：2024/12/15</p>
+            <button>領取優惠券</button>
+        </div>
+    </div>
+
+    <script src="../JS/VisualScript.js"></script>
+</body>
 </html>
