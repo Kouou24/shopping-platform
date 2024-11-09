@@ -1,15 +1,101 @@
-<html>
-    <head>
-        <link rel = "stylesheet" href= "../CSS/style.css">
-    </head>
-    <body>
-        <h1>商城</h1>
-        <div class="nav">
-            <a href="home.html">首頁</a>
-            <a href="shop.html">商場</a>
-            <a href="activity.html">活動</a>
-            <a href="coupon.html">優惠券</a>
-            <a href="clientservice.html">客戶服務</a>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JB購物商城</title>
+    <link rel="stylesheet" href="../CSS/style.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <div class="logo">JB購物</div>
+        <div class="search-bar">
+            <input type="text" placeholder="搜尋商品...">
+            <button>搜尋</button>
         </div>
-    </body>
+        <div class="user-options">
+            <a href="#">註冊</a>
+            <a href="#">登入</a>
+            <a href="#"><img src="https://via.placeholder.com/24" alt="購物車"></a>
+        </div>
+    </div>
+
+    <!-- Navigation Section -->
+    <div class="nav">
+        <a href="home.html">首頁</a>
+        <a href="shop.html">商場</a>
+        <a href="activity.html">活動</a>
+        <a href="coupon.html">優惠券</a>
+        <a href="clientservice.html">客戶服務</a>
+    </div>
+
+    <!-- Sidebar and Products Section -->
+    <div class="container">
+        <!-- Sidebar for Filtering -->
+        <div class="filters">
+            <!-- 商品分類選項 -->
+            <div class="category-filters">
+                <h3>商品分類</h3>
+                <button>電子產品</button>
+                <button>服飾</button>
+                <button>居家生活</button>
+                <button>美妝保養</button>
+                <button>更多...</button>
+            </div>
+    
+            <!-- 篩選條件 -->
+            <div class="sort-filters">
+                <h3>排序條件</h3>
+                <select>
+                    <option value="popularity">依熱門度排序</option>
+                    <option value="price-asc">價格：低到高</option>
+                    <option value="price-desc">價格：高到低</option>
+                    <option value="newest">最新上架</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Products Section -->
+        <div class="container">
+            <h2>JB購物商場</h2>
+            <div class="product-list">
+                <div class="product-item">
+                    <img src="https://inews.gtimg.com/om_bt/ObiyLSdimfHw64NsVojNI70vSRasEQyeCEB89xvjP-5nkAA/641" alt="商品1">
+                    <div class="product-info">
+                        <h4>商品1</h4>
+                        <p>價格：$299</p>
+                        <button>加入購物車</button>
+                    </div>
+                </div>
+                <!-- Product 2 -->
+                <div class="product-item">
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSGh_3muGxHuLhFgnGhf85gSJYWpHQ-17F1FA&s" alt="商品2">
+                    <div class="product-info">
+                        <h4>商品2</h4>
+                        <p>價格：$399</p>
+                        <button>加入購物車</button>
+                    </div>
+                </div>
+                <!-- Product 3 -->
+                <div class="product-item">
+                    <img src="https://media1.tenor.com/m/TLJLozctLMQAAAAd/yuki-sakuna-vtuber.gif" alt="商品3">
+                    <div class="product-info">
+                        <h4>商品3</h4>
+                        <p>價格：$499</p>
+                        <button>加入購物車</button>
+                    </div>
+                </div>
+                <!-- More products can be added here -->
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer Section -->
+    <div class="footer">
+        <p>JB購物 © 2024</p>
+    </div>
+
+    <script src="../JS/VisualScript.js"></script>
+</body>
 </html>
