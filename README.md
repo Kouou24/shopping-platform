@@ -4,7 +4,7 @@ git clone https://github.com/Kouou24/shopping-platform.git
 
 #第二步
 
-刪除node_modules資料夾和package-lock.json
+刪除package-lock.json
 
 #第三步
 
