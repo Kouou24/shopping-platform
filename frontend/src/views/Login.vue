@@ -1,131 +1,236 @@
 <template>
-    <div class="login-container">
-      <h1>登入</h1>
-      <form @submit.prevent="handleSubmit">
+  <div class="member-container">
+    <h2>會員管理</h2>
+
+    <!-- 會員列表 -->
+    <div class="member-list">
+      <table>
+        <thead>
+          <tr>
+            <th>會員ID</th>
+            <th>暱稱</th>
+            <th>帳號</th>
+            <th>電子郵件</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="member in result" :key="member.Member_ID">
+            <td>{{ member.Member_ID }}</td>
+            <td>{{ member.Nickname }}</td>
+            <td>{{ member.User_Account }}</td>
+            <td>{{ member.Email }}</td>
+            <td>
+              <button @click="loginAccount(member)">查看詳情</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 詳情 Modal -->
+    <div v-if="inDB" class="modal-overlay">
+      <div class="modal-content">
+        <h3>會員詳情</h3>
+        <div class="modal-body">
+          <p><strong>暱稱:</strong> {{ selectedMember.Nickname }}</p>
+          <p><strong>帳號:</strong> {{ selectedMember.User_Account }}</p>
+          <p><strong>電子郵件:</strong> {{ selectedMember.Email }}</p>
+          <p><strong>地址:</strong> {{ selectedMember.Address }}</p>
+          <button @click="closeModal">關閉</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 會員表單 -->
+    <div class="member-form">
+      <h3>登入</h3>
+      <form @submit.prevent="save">
+        <div class="form-group"> 
+          <label for="account">帳號:</label>
+          <input v-model="Account" type="text" id="account" required />
+          <p>{{ Account }}</p>
+        </div>
         <div class="form-group">
-          <label for="email">電子郵件或使用者名稱</label>
-          <input
-            type="text"
-            id="email"
-            v-model="form.email"
-            placeholder="請輸入您的電子郵件或使用者名稱"
-            required
-          />
+          <label for="address">密碼:</label>
+          <input v-model="Password" type="text" id="address" />
+          <p>{{ Password }}</p>
         </div>
-  
-        <div class="form-group">
-          <label for="password">密碼</label>
-          <input
-            type="password"
-            id="password"
-            v-model="form.password"
-            placeholder="請輸入您的密碼"
-            required
-          />
-        </div>
-  
-        <button type="submit" class="login-button">登入</button>
-  
-        <div class="register-link">
-          <p>還沒有帳號？ <router-link to="/register">立即註冊</router-link></p>
-        </div>
+        <button type="submit" @click="handleLogin">登入</button>
       </form>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    data() {
-      return {
-        form: {
-          email: "",
-          password: "",
-        },
-      };
-    },
-    methods: {
-      handleSubmit() {
-        if (!this.form.email || !this.form.password) {
-          alert("請填寫所有欄位！");
-          return;
-        }
-  
-        // 模擬成功登入
-        alert("登入成功！");
-      },
-    },
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+const Account = ref("")
+const Password = ref("")
+const isLoggedIn = ref(false)  // 改為 ref，以便修改其值
+const result = ref([]);
+const isInList = ref(false);
+const member = ref({
+  Member_ID: '',
+  Nickname: '',
+  User_Account: '',
+  User_Password: '',
+  Email: '',
+  Address: '',
+  created_at: '',
+  updated_at: '',
+});
+const inDB = ref(false);
+const selectedMember = ref({});
+
+// 預設載入會員資料
+const MemberLoad = () => {
+  const page = "http://127.0.0.1:8000/api/member";
+  axios.get(page).then(({ data }) => {
+    result.value = data;
+  });
+};
+
+// 登入帳號顯示會員資料
+const loginAccount = (selected) => {
+  selectedMember.value = selected;
+  inDB.value = true;
+};
+
+// 關閉 Modal
+const closeModal = () => {
+  inDB.value = false;
+};
+
+// 重置會員資料
+const resetMember = () => {
+  member.value = {
+    Member_ID: '',
+    Nickname: '',
+    User_Account: '',
+    User_Password: '',
+    Email: '',
+    Address: '',
+    created_at: '',
+    updated_at: '',
   };
-  </script>
-  
-  <style scoped>
-  .login-container {
-    max-width: 360px;
-    margin: 60px auto;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background: #f9f9f9;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+};
+
+const handleLogin = () => {
+  // 使用 .value 訪問 ref，並判斷帳號密碼是否在資料中
+  isInList.value = result.value.some(item => item.User_Account === Account.value && item.User_Password === Password.value);
+
+  if (isInList.value) {
+    isLoggedIn.value = true;
+    alert('登入成功');
+  } else {
+    isLoggedIn.value = false;
+    alert('登入失敗');
   }
-  
-  h1 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #333;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 5px;
-    color: #555;
-  }
-  
-  input {
-    width: 100%;
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  input:focus {
-    border-color: #007bff;
-    outline: none;
-  }
-  
-  .login-button {
-    width: 100%;
-    padding: 10px;
-    font-size: 16px;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .login-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .register-link {
-    margin-top: 20px;
-    text-align: center;
-  }
-  
-  .register-link a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  
-  .register-link a:hover {
-    text-decoration: underline;
-  }
-  </style>
-  
+};
+
+// 在組件掛載後載入資料
+onMounted(() => {
+  MemberLoad();
+});
+</script>
+
+
+
+<style scoped>
+.member-container {
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.member-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.member-list th, .member-list td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+button {
+  padding: 6px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 400px;
+}
+
+.modal-body {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.member-form form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.member-form button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.member-form button:hover {
+  background-color: #45a049;
+}
+</style>

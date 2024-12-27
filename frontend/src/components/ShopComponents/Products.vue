@@ -103,7 +103,7 @@ export default{
         updateData()
         {
             var editrecords = 'http://127.0.0.1:8000/api/products'+ this.product.id;
-            axios.put(editrecords, this.student)
+            axios.put(editrecords, this.product)
             .then(
             ({data})=>{
                 this.ProductLoad();
