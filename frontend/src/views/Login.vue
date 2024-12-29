@@ -10,7 +10,7 @@
             <th>會員ID</th>
             <th>暱稱</th>
             <th>帳號</th>
-            <th>電子郵件</th>
+            <th>密碼</th>
             <th>操作</th>
           </tr>
         </thead>
@@ -19,7 +19,7 @@
             <td>{{ member.Member_ID }}</td>
             <td>{{ member.Nickname }}</td>
             <td>{{ member.User_Account }}</td>
-            <td>{{ member.Email }}</td>
+            <td>{{ member.User_Password }}</td>
             <td>
               <button @click="loginAccount(member)">查看詳情</button>
             </td>
@@ -53,7 +53,7 @@
         </div>
         <div class="form-group">
           <label for="address">密碼:</label>
-          <input v-model="Password" type="text" id="address" />
+          <input v-model="Password" type="password" id="address" />
           <p>{{ Password }}</p>
         </div>
         <button type="submit" @click="handleLogin">登入</button>
@@ -63,9 +63,11 @@
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
+const router = useRouter();
 const Account = ref("")
 const Password = ref("")
 const isLoggedIn = ref(false)  // 改為 ref，以便修改其值
@@ -123,10 +125,11 @@ const handleLogin = () => {
 
   if (isInList.value) {
     isLoggedIn.value = true;
-    alert('登入成功');
+    router.push('/');
   } else {
     isLoggedIn.value = false;
     alert('登入失敗');
+    router.push('/login');
   }
 };
 
