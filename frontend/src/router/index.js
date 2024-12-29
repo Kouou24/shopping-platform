@@ -6,6 +6,7 @@ import Coupon from '../views/Coupon.vue';
 import ClientService from '../views/ClientService.vue';
 import Register from '../views/Register.vue';
 import Login from '../views/Login.vue';
+import MyAccount from '../views/MyAccount.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: Home },
@@ -13,8 +14,9 @@ const routes = [
   { path: '/activity', name: 'Activity', component: Activity },
   { path: '/coupon', name: 'Coupon', component: Coupon },
   { path: '/client-service', name: 'ClientService', component: ClientService },
-  { path: '/Register', name: 'Register', component: Register },
-  { path: '/Login', name: 'Login', component: Login },
+  { path: '/register', name: 'Register', component: Register },
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/myaccount', name: 'MyAccount', component: MyAccount },
 ];
 
 const router = createRouter({

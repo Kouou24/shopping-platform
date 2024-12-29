@@ -5,16 +5,27 @@
         <input type="text" placeholder="註冊獲得全站優惠券與免運費" />
         <button>搜尋</button>
       </div>
-      <div class="user-options">
+      <div class="user-options" v-if="authStore.isLoggedIn === false">
         <router-link to="/register" class="nav-item">註冊</router-link>
         <router-link to="/login" class="nav-item">登入</router-link>
+        <a href="#"><img src="/picture/shopping-cart.png" alt="購物車" /></a>
+      </div>
+      <div class="user-options" v-if="authStore.isLoggedIn === true">
+        <router-link to="/myaccount" class="nav-item">我的帳戶</router-link>
+        <router-link to="/register" class="nav-item" @click="handleLogout">登出</router-link>
         <a href="#"><img src="/picture/shopping-cart.png" alt="購物車" /></a>
       </div>
     </div>
   </template>
 
 <script setup>
+import { useAuthStore } from '../stores/auth';
 
+const authStore = useAuthStore();
+
+const handleLogout = () =>{
+  authStore.logout()
+};
 </script>
 
 <style scoped>

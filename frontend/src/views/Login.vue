@@ -66,11 +66,14 @@
 import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
+import { useAuthStore } from '../stores/auth';
+
 
 const router = useRouter();
 const Account = ref("")
 const Password = ref("")
-const isLoggedIn = ref(false)  // 改為 ref，以便修改其值
+const authStore = useAuthStore();
+
 const result = ref([]);
 const isInList = ref(false);
 const member = ref({
@@ -124,12 +127,17 @@ const handleLogin = () => {
   isInList.value = result.value.some(item => item.User_Account === Account.value && item.User_Password === Password.value);
 
   if (isInList.value) {
-    isLoggedIn.value = true;
+    // 找到符合條件的會員資料
+    const loggedInMember = result.value.find(item => item.User_Account === Account.value && item.User_Password === Password.value);
+
+    // 設定 memberID 到 authStore
+    authStore.setMemberID(loggedInMember.Member_ID);
+
+    // 設定登入狀態
+    authStore.login();
     router.push('/');
   } else {
-    isLoggedIn.value = false;
     alert('登入失敗');
-    router.push('/login');
   }
 };
 
