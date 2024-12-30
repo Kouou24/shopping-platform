@@ -6,7 +6,7 @@
 </template>
 
 <script setup>
-  import sidebarSec from '../components/ShopComponents/Sidebar.vue';
+  //import sidebarSec from '../components/ShopComponents/Sidebar.vue';
   import productsSec from '../components/ShopComponents/Products.vue';
 </script>
 

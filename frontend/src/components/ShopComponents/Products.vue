@@ -1,8 +1,32 @@
 <template>
     <h2>JB購物商場</h2>
+
+    <!-- 篩選欄 -->
+    <div class="filters">
+        <!-- 商品分類選項 -->
+        <div class="category-filters">
+            <h3>商品分類</h3>
+            <button>電子產品</button>
+            <button>服飾</button>
+            <button>居家生活</button>
+            <button>美妝保養</button>
+            <button>更多...</button>
+        </div>
+
+        <!-- 排序條件 -->
+        <div class="sort-filters">
+            <h3>排序條件</h3>
+            <select v-model="sortOrder" @change="sortProducts">
+                <option value="asc">價格：低到高</option>
+                <option value="desc">價格：高到低</option>
+                <option value="newest">最新上架</option>
+            </select>
+        </div>
+    </div>
+
     <div class="product-list">
-        <div v-for="product in result" v-bind:key="product.Product_ID" class="product-item">
-            <img :src="product.imgLink" alt="商品1">
+        <div v-for="product in sortedResult" v-bind:key="product.Product_ID" class="product-item">
+            <img :src="product.imgLink" alt="商品">
             <div class="product-info">
                 <h4>{{ product.Product_Name }}</h4>
                 <p>價格：${{ product.Price }}</p>
@@ -12,6 +36,7 @@
         </div>
     </div>
 
+    <!-- 模態框 -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
         <div class="modal-content" @click.stop>
             <img :src="selectedProduct.imgLink" class="model_img">
@@ -30,179 +55,189 @@
 <script>
 import axios from 'axios';
 
-export default{
+export default {
     name: 'Product',
-    data(){
+    data() {
         return {
-            result:{},
-            product:{
-                Product_ID: '',
-                Seller_ID: '',
-                Product_Name: '',
-                Product_Description: '',
-                Price: '',
-                Release_date: '',
-                Stock_quantity: '',
-                imgLink: '',
-            },
+            result: [],
+            sortOrder: 'asc', // 預設排序方式
             showModal: false,
             selectedProduct: {},
-        }
+        };
     },
     created() {
         this.ProductLoad();
     },
-    mounted(){
-        console.log("123");
-    },
-
-    methods: {
-        ProductLoad()
-        {
-            var page = "http://127.0.0.1:8000/api/products"
-            axios.get(page)
-            .then(
-                ({data})=>{
-                    this.result = data;
+    computed: {
+        sortedResult() {
+            return this.result.slice().sort((a, b) => {
+                if (this.sortOrder === 'asc') {
+                    return a.Price - b.Price;
+                } else if (this.sortOrder === 'desc') {
+                    return b.Price - a.Price;
+                } else if (this.sortOrder === 'newest') {
+                    return a.Product_ID - b.Product_ID; // 最新上架依 Product_ID 排序
+                } else {
+                    return 0;
                 }
-            );
+            });
         },
-
-        save()
-        {
-            if(this.product.id == ''){
-                this.saveData();
-            }
-            else{
-                this.updateData();
-            }
+    },
+    methods: {
+        ProductLoad() {
+            axios.get("http://127.0.0.1:8000/api/products")
+                .then(({ data }) => {
+                    this.result = data;
+                });
         },
-
-        saveData()
-        {
-            axios.post("http://127.0.0.1:8000/api/products", this.product)
-            .then(
-              ({data})=>{
-                this.product = {
-                    Product_ID: '',
-                    Seller_ID: '',
-                    Product_Name: '',
-                    Product_Description: '',
-                    Price: '',
-                    Release_date: '',
-                    Stock_quantity: '',
-                    imgLink: '',
-                };
-              }
-            )
+        sortProducts() {
+            // 這個方法用於觸發排序更新，實際邏輯由 computed 處理
         },
-
-        updateData()
-        {
-            var editrecords = 'http://127.0.0.1:8000/api/products'+ this.product.id;
-            axios.put(editrecords, this.product)
-            .then(
-            ({data})=>{
-                this.ProductLoad();
-                this.product.Product_ID= '',
-                this.product.Seller_ID= '',
-                this.product.Product_Name= '',
-                this.product.Product_Description= '',
-                this.product.Price= '',
-                this.product.Release_date= '',
-                this.product.tock_quantity= '',
-                this.product.imgLink= ''
-            }
-            );
-        },
-        showDetails(product) 
-        {
+        showDetails(product) {
             this.selectedProduct = product;
             this.showModal = true;
         },
-        closeModal()
-        {
+        closeModal() {
             this.showModal = false;
         },
-    }
-}
+    },
+};
 </script>
 
 <style scoped>
-    /* 商品列表外框 */
-    .product-list {
-        display: flex;
-        flex-wrap: wrap; /* 讓多行顯示 */
-        gap: 20px; /* 每個商品之間的間距 */
-        justify-content: space-between; /* 左右對齊 */
-    }
+/* 篩選區樣式 */
+.filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-    /* 單個商品的樣式 */
-    .product-item {
-        background-color: #fff;
-        flex: 1 1 calc(33% - 20px); /* 寬度約為三分之一 */
-        max-width: 300px; /* 設置最大寬度 */
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s;
-    }
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
 
-    .product-item:hover {
-        transform: translateY(-5px); /* 滑鼠懸停效果 */
-    }
+.category-filters h3 {
+    margin-right: 10px;
+    color: #333;
+}
 
-    .product-item img {
-        width: 100%; /* 確保圖片寬度填滿 */
-        height: auto;
-    }
+.category-filters button {
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
-    .product-info {
-        padding: 15px;
-        text-align: center;
-    }
+.category-filters button:hover {
+    background-color: #ff5ccd;
+    color: white;
+}
 
-    /* 按鈕樣式 */
-    button {
-        padding: 8px 15px;
-        margin-top: 10px;
-        background-color: #ff5ccd;
-        color: #fff;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        color: black;
-    }
+.sort-filters {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 10px;
+}
 
-    button:hover {
-        background-color: #e0218a;
-    }
+.sort-filters h3 {
+    margin-right: 10px;
+    color: #333;
+}
 
-    /* 模態框樣式 */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-    }
+.sort-filters select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
 
-    .modal-content {
-        background: white;
-        padding: 20px;
-        border-radius: 8px;
-        width: 300px;
-        text-align: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
+/* 商品列表外框 */
+.product-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+    margin-bottom: 40px;
+}
 
-    .model_img {
-        width: 300px;
-    }
+/* 單個商品樣式 */
+.product-item {
+    background-color: #fff;
+    flex: 1 1 calc(33% - 20px);
+    max-width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+    text-align: center;
+}
+
+.product-item:hover {
+    transform: translateY(-5px);
+}
+
+.product-item img {
+    width: 100%;
+    height: auto;
+}
+
+.product-info {
+    padding: 15px;
+    text-align: center;
+}
+
+button {
+    padding: 8px 15px;
+    margin-top: 10px;
+    background-color: #ff5ccd;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #e0218a;
+}
+
+/* 模態框樣式 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.model_img {
+    width: 100%;
+    height: auto;
+}
 </style>
