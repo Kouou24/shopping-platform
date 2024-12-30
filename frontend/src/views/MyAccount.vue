@@ -2,6 +2,7 @@
     <div v-for="member in memberResult" :key="member.Member_ID">
         <div v-if="member.Member_ID === authStore.memberID && !sellerResult.some(item => item.Member_ID === authStore.memberID)">
             <p>你好 {{ member.Nickname }} 用戶</p>
+            <ClientView/>
         </div>
         <div v-if="member.Member_ID === authStore.memberID && sellerResult.some(item => item.Member_ID === authStore.memberID)">
             <p>你好 {{ member.Nickname }} 賣家</p>
@@ -13,7 +14,7 @@
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import axios from 'axios';
-
+import ClientView from '../components/MyAccountComponents/ClientView.vue';
 
 const memberResult = ref([]);
 const sellerResult = ref([]);
