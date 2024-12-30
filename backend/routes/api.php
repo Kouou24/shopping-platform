@@ -5,6 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\CouponsController;
+use App\Http\Controllers\OrdersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,3 +28,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::apiResource('/products', ProductController::class);
 Route::apiResource('/seller', SellerController::class);
 Route::apiResource('/member', MemberController::class);
+Route::apiResource('/customer', CustomerController::class);
+Route::apiResource('/administrator', AdministratorController::class);
+Route::apiResource('/coupons', CouponsController::class);
+Route::apiResource('/orders', OrdersController::class);
