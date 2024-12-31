@@ -33,7 +33,7 @@
 export default {
     data() {
         return {
-            eventEndTime: new Date().getTime() + 72 * 60 * 60 * 1000, // 活動結束時間（72小時後）
+            eventEndTime: null, // 活動結束時間
             countdown: '', // 倒計時
             products: [
                 {
@@ -48,7 +48,7 @@ export default {
                     name: "曉靡智能手錶",
                     image: "https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1609745689.92113599!400x400!85.png",
                     originalPrice: 3000,
-                    discountPrice: 2599,           
+                    discountPrice: 2599,
                 },
                 {
                     id: 3,
@@ -68,10 +68,21 @@ export default {
         };
     },
     mounted() {
+        this.initEventEndTime(); // 初始化活動結束時間
         this.updateCountdown();
         setInterval(this.updateCountdown, 1000);
     },
     methods: {
+        initEventEndTime() {
+            const savedEndTime = localStorage.getItem('eventEndTime');
+
+            if (savedEndTime) {
+                this.eventEndTime = parseInt(savedEndTime, 10);
+            } else {
+                this.eventEndTime = new Date().getTime() + 72 * 60 * 60 * 1000; // 預設72小時後
+                localStorage.setItem('eventEndTime', this.eventEndTime);
+            }
+        },
         updateCountdown() {
             const now = new Date().getTime();
             const distance = this.eventEndTime - now;
@@ -111,7 +122,6 @@ export default {
     font-size: 1.2rem;
     margin-bottom: 20px;
 }
-
 
 /* 商品區樣式 */
 .product-section {

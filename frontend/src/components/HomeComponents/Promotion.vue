@@ -1,6 +1,6 @@
 <template>
     <div class="promo">
-        <p>再享 $100 優惠券，免運費！</p>
+        <p>曉靡超值活動正在如火如荼進行中！！</p>
     </div>
 </template>
 
