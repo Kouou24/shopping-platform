@@ -10,7 +10,7 @@
 
         <div class="content">
             <div v-for="member in memberResult">
-                <div v-if="currentSection === 'info' && member.Member_ID === authStore.memberID">
+                <div v-if="currentSection === 'info'">
                     <h3>我的資訊</h3>
                     <p>名稱: {{ member.Nickname }}</p>
                     <p>電子郵件: {{ member.Email }}</p>
@@ -33,11 +33,11 @@
                         </thead>
                         <tbody>
                         <tr v-for="order in orderResult" :key="order.Order_ID">
-                            <td v-if="order.Customer_ID === authStore.memberID">{{ order.Order_ID }}</td>
-                            <td v-if="order.Customer_ID === authStore.memberID">{{ order.Order_Date }}</td>
-                            <td v-if="order.Customer_ID === authStore.memberID">{{ order.Paid_Date }}</td>
-                            <td v-if="order.Customer_ID === authStore.memberID">{{ order.Deliver_Address }}</td>
-                            <td v-if="order.Customer_ID === authStore.memberID">
+                            <td >{{ order.Order_ID }}</td>
+                            <td>{{ order.Order_Date }}</td>
+                            <td>{{ order.Paid_Date }}</td>
+                            <td>{{ order.Deliver_Address }}</td>
+                            <td>
                                 <button @click="loginAccount(member)">查看詳情</button>
                             </td>
                         </tr>
@@ -77,7 +77,7 @@
 
     // 加載使用者資訊
     const MemberLoad = () => {
-        const page = "http://127.0.0.1:8000/api/member";
+        const page = "http://127.0.0.1:8000/api/members/" + authStore.memberID;
         axios.get(page).then(({ data }) => {
             memberResult.value = data;
         });
@@ -85,7 +85,7 @@
 
     // 加載使用者訂單
     const OrdersLoad = () => {
-        const page = "http://127.0.0.1:8000/api/orders";
+        const page = "http://127.0.0.1:8000/api/orders/" + authStore.memberID;
         axios.get(page).then(({ data }) => {
             orderResult.value = data;
         });
