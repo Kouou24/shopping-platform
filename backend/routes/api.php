@@ -47,4 +47,9 @@ Route::apiResource('/administrator', AdministratorController::class);
 
 Route::apiResource('/coupons', CouponsController::class);
 
-Route::apiResource('/orders', OrdersController::class);
+// Route::apiResource('/orders', OrdersController::class);
+Route::get('/orders', [OrdersController::class, 'index']); 
+Route::post('/orders', [OrdersController::class, 'store']); 
+Route::get('/orders/{id}', [OrdersController::class, 'show']); 
+Route::put('/orders/{id}', [OrdersController::class, 'update']); 
+Route::delete('/orders/{id}', [OrdersController::class, 'destroy']); 

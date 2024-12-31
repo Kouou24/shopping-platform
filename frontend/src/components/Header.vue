@@ -8,7 +8,6 @@
       <div class="user-options" v-if="authStore.isLoggedIn === false">
         <router-link to="/register" class="nav-item">註冊</router-link>
         <router-link to="/login" class="nav-item">登入</router-link>
-        <router-link to="/shopping_cart"><img src="/picture/shopping-cart.png" alt="購物車" /></router-link>
       </div>
       <div class="user-options" v-if="authStore.isLoggedIn === true">
         <router-link to="/myaccount" class="nav-item">我的帳戶</router-link>

@@ -46,63 +46,80 @@
             <p>數量：{{ selectedProduct.Stock_quantity }}</p>
             <p>發佈日期：{{ selectedProduct.Release_date }}</p>
             <p>賣家：{{ selectedProduct.Seller_ID }}</p>
-            <button>加入購物車</button> 
+            <button @click="addToShoppingCart(selectedProduct.Product_ID)">加入購物車</button> 
             <button @click="closeModal">關閉</button>
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
+import { useAuthStore } from '../../stores/auth';
 
-export default {
-    name: 'Product',
-    data() {
-        return {
-            result: [],
-            sortOrder: 'asc', // 預設排序方式
-            showModal: false,
-            selectedProduct: {},
-        };
-    },
-    created() {
-        this.ProductLoad();
-    },
-    computed: {
-        sortedResult() {
-            return this.result.slice().sort((a, b) => {
-                if (this.sortOrder === 'asc') {
-                    return a.Price - b.Price;
-                } else if (this.sortOrder === 'desc') {
-                    return b.Price - a.Price;
-                } else if (this.sortOrder === 'newest') {
-                    return a.Product_ID - b.Product_ID; // 最新上架依 Product_ID 排序
-                } else {
-                    return 0;
-                }
-            });
-        },
-    },
-    methods: {
-        ProductLoad() {
-            axios.get("http://127.0.0.1:8000/api/products")
-                .then(({ data }) => {
-                    this.result = data;
-                });
-        },
-        sortProducts() {
-            // 這個方法用於觸發排序更新，實際邏輯由 computed 處理
-        },
-        showDetails(product) {
-            this.selectedProduct = product;
-            this.showModal = true;
-        },
-        closeModal() {
-            this.showModal = false;
-        },
-    },
+const router = useRouter();
+const authStore = useAuthStore();
+
+// 響應式資料
+const result = ref([]);
+const sortOrder = ref('asc'); // 預設排序方式
+const showModal = ref(false);
+const selectedProduct = ref({});
+
+// 加載產品資料
+const ProductLoad = () => {
+  axios.get("http://127.0.0.1:8000/api/products")
+    .then(({ data }) => {
+      result.value = data;
+    })
+    .catch(error => {
+      console.error("Error loading products:", error);
+    });
 };
+
+// 排序後的結果
+const sortedResult = computed(() => {
+  return result.value.slice().sort((a, b) => {
+    if (sortOrder.value === 'asc') {
+      return a.Price - b.Price;
+    } else if (sortOrder.value === 'desc') {
+      return b.Price - a.Price;
+    } else if (sortOrder.value === 'newest') {
+      return a.Product_ID - b.Product_ID; // 最新上架依 Product_ID 排序
+    } else {
+      return 0;
+    }
+  });
+});
+
+// 顯示產品詳情
+const showDetails = (product) => {
+    selectedProduct.value = product;
+    showModal.value = true;
+};
+
+const addToShoppingCart = (Product_id) =>{
+    if (authStore.isLoggedIn) {
+        authStore.addShopingCartList(Product_id);
+        alert('已加入購物車');
+    } else {
+        alert("請先登入帳號");
+        router.push('/login');
+    }
+};
+
+// 關閉詳情視窗
+const closeModal = () => {
+  showModal.value = false;
+};
+
+// 組件掛載時載入產品
+onMounted(() => {
+  ProductLoad();
+});
 </script>
+
 
 <style scoped>
 /* 篩選區樣式 */

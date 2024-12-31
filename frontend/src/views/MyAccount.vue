@@ -21,7 +21,7 @@ const sellerResult = ref([]);
 const authStore = useAuthStore();
 
 const MemberLoad = () => {
-  const page = "http://127.0.0.1:8000/api/member";
+  const page = "http://127.0.0.1:8000/api/members";
   axios.get(page).then(({ data }) => {
     memberResult.value = data;
   });

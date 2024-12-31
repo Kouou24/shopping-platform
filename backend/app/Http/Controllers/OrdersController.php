@@ -3,22 +3,28 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Orders;
+use Illuminate\Support\Facades\DB;
 
 class OrdersController extends Controller
 {
-    protected $orders;
-    public function __construct(){
-        $this->orders = new Orders();
-    }
-
     public function index(){
-        return $this->orders->all();
+        return DB::select('SELECT * FROM oreders');
     }
 
     public function store(Request $request)
     {
-        return $this->orders->create($request->all());
+        $result = DB::insert(
+            'INSERT INTO orders (Customer_ID, Coupon_ID, Order_Status, Paid_Date, Deliver_Address)
+             VALUES (?, ?, ?, ?, ?)',
+            [
+                $request->Customer_ID,
+                $request->Coupon_ID,
+                $request->Order_Status,
+                $request->Paid_Date,
+                $request->Deliver_Address
+            ]
+        );
+        return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
 
     /**
@@ -26,7 +32,7 @@ class OrdersController extends Controller
      */
     public function show(string $id)
     {
-        $orders = $this->orders->find($id); 
+        return DB::select('SELECT * FROM orders WHERE Customer_ID = ?', [$id]);
     }
 
     /**
@@ -34,9 +40,18 @@ class OrdersController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $orders = $this->orders->find($id);
-        $orders->update($request->all());
-        return $orders;
+        $result = DB::update(
+            'UPDATE orders 
+             SET Customer_ID = ?, Coupon_ID = ?, Order_Status = ?, Paid_Date = ?, Deliver_Address = ? 
+             WHERE Order_ID = ?',
+            [
+                $request->Customer_ID,
+                $request->Coupon_ID,
+                $request->Order_Status,
+                $request->Paid_Date,
+                $request->Deliver_Address
+            ]
+        );
     }
 
     /**
@@ -44,7 +59,8 @@ class OrdersController extends Controller
      */
     public function destroy(string $id)
     {
-        $orders = $this->orders->find($id);
-        return $orders->delete();
+        $result = DB::delete('DELETE FROM orders 
+                              WHERE Order_ID = ?',[$id]);
+        return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
 }
