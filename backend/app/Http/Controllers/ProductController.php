@@ -3,30 +3,31 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Products;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    protected $products;
-    public function __construct() 
-    {
-        $this->products = new Products();
-    }
-
     public function index()
     {
-        return $this->products->all();
+        return DB::select('SELECT * FROM products');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        return $this->products->create($request->all());
+        $result = DB::insert(
+            'INSERT INTO products (Seller_ID, Product_Name, Product_Description, Price, Release_date, Stock_quantity, imgLink) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [
+                $request->Seller_ID,
+                $request->Product_Name,
+                $request->Product_Description, 
+                $request->Price,
+                $request->Release_date,
+                $request->Stock_quantity,
+                $request->imgLink
+            ]
+        );
+        return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
 
     /**
@@ -34,7 +35,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $products = $this->products->find($id); 
+        return DB::select('SELECT * FROM products WHERE Product_ID = ?', [$id]);
     }
 
     /**
@@ -42,9 +43,21 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $products = $this->products->find($id);
-        $products->update($request->all());
-        return $products;
+        $result = DB::update(
+            'UPDATE products 
+            SET Seller_ID = ?, Product_Name = ?, Product_Description = ?, Price = ?, Release_date = ?, Stock_quantity = ?, imgLink = ?  
+            WHERE Product_ID = ?',
+            [
+                $request->Seller_ID,
+                $request->Product_Name,
+                $request->Product_Description, 
+                $request->Price,
+                $request->Release_date,
+                $request->Stock_quantity,
+                $request->imgLink,
+                $id
+            ]
+       );
     }
 
     /**
@@ -52,7 +65,8 @@ class ProductController extends Controller
      */
     public function destroy(string $id)
     {
-        $products = $this->products->find($id);
-        return $products->delete();
+        $result = DB::delete('DELETE FROM products 
+                              WHERE Product_ID = ?',[$id]);
+        return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
 }
