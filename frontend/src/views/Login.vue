@@ -91,7 +91,7 @@ const selectedMember = ref({});
 
 // 預設載入會員資料
 const MemberLoad = () => {
-  const page = "http://127.0.0.1:8000/api/member";
+  const page = "http://127.0.0.1:8000/api/members";
   axios.get(page).then(({ data }) => {
     result.value = data;
   });

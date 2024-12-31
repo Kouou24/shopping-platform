@@ -78,7 +78,6 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
@@ -108,30 +107,35 @@ const selectedMember = ref({});
 
 // 預設載入會員資料
 const MemberLoad = () => {
-  const page = "http://127.0.0.1:8000/api/member";
+  const page = "http://127.0.0.1:8000/api/members";
   axios.get(page).then(({ data }) => {
     result.value = data;
   });
 };
 
 const saveData = () => {
-  const page = "http://127.0.0.1:8000/api/member";
-  axios.post(page, member.value).then(({ data }) => {
-    alert("saved");
-    MemberLoad(); // 呼叫 MemberLoad 函數重新載入資料
-    member.value = { // 重置 member
-      Member_ID: '',
-      Nickname: '',
-      User_Account: '',
-      User_Password: '',
-      Email: '',
-      Address: '',
-    };
-  }).catch(error => {
-    console.error("Error saving data:", error);
-    alert("無法儲存資料，請檢查網路或伺服器設定");
-  });
+  const page = "http://127.0.0.1:8000/api/members";
+  axios.post(page, member.value)
+    .then(({ data }) => {
+      alert("註冊成功");
+      MemberLoad(); // 重新載入資料
+      member.value = { // 重置 member
+        Member_ID: '',
+        Nickname: '',
+        User_Account: '',
+        User_Password: '',
+        Email: '',
+        Address: '',
+        created_at: '',
+        updated_at: '',
+      };
+    })
+    .catch(error => {
+      console.error("Error saving data:", error.response ? error.response.data : error.message);
+      alert("無法儲存資料，請檢查網路或伺服器設定");
+    });
 };
+
 
 
 // 登入帳號顯示會員資料
@@ -149,11 +153,11 @@ const closeModal = () => {
 const resetMember = () => {
   member.value = {
     Member_ID: '',
-    Nickname: '',
-    User_Account: '',
-    User_Password: '',
-    Email: '',
-    Address: '',
+    nickname: '',
+    user_account: '',
+    user_password: '',
+    email: '',
+    address: '',
     created_at: '',
     updated_at: '',
   };
