@@ -9,7 +9,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\OrdersController;
-
+use App\Http\Controllers\SellersProductController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -33,6 +33,7 @@ Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']); 
 
 Route::apiResource('/seller', SellerController::class);
+Route::get('/seller/products/{id}', [SellersProductController::class, 'show']);
 
 // Route::apiResource('/member', MemberController::class);
 Route::get('/members', [MemberController::class, 'index']); 
