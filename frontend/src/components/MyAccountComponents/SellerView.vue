@@ -10,6 +10,9 @@
 
         <div class="content">
            
+            <div v-if="currentSection === 'info'">
+                <button @click="SetShowAddProductModalTrue">新增商品</button>
+            </div >
            <div v-for="product in productResult">
                 <div v-if="currentSection === 'info'">
                     <div class="product-list">
@@ -82,6 +85,34 @@
             <button @click="closeModal">關閉</button>
         </div>
     </div>
+    <div v-if="showAddProductModal" class="modal-overlay">
+    <div class="member-form">
+        <form @submit.prevent="save">
+            <div class="form-group">
+                <label for="address">商品名稱:</label>
+                <input v-model="addProduct.Product_Name" type="text" id="address" required />
+            </div>
+            <div class="form-group">
+                <label for="address">商品描述:</label>
+                <input v-model="addProduct.Product_Description" type="text" id="address" required />
+            </div>
+            <div class="form-group">
+                <label for="address">商品價格:</label>
+                <input v-model="addProduct.Price" type="text" id="address" required />
+            </div>
+            <div class="form-group">
+                <label for="address">商品出售日期:</label>
+                <input v-model="addProduct.Release_date" type="text" id="address" required />
+            </div>
+            <div class="form-group">
+                <label for="address">商品庫存:</label>
+                <input v-model="addProduct.Stock_quantity" type="text" id="address" required />
+            </div>
+            <button type="submit" @click="saveData">確認</button>
+            <button @click="SetShowAddProductModalFalse">取消</button>
+        </form>
+    </div>
+    </div>
 </template>
 <script setup>
     import { ref, onMounted } from 'vue';
@@ -94,6 +125,17 @@
     const orderResult = ref([]);
     const selectedProduct = ref({});
     const showModal = ref(false);
+    const showAddProductModal = ref(false);
+    const productNum = 0;
+    const addProduct = ref({
+        'Seller_ID': authStore.memberID,
+        'Product_Name': '',
+        'Product_Description': '',
+        'Price': '' ,
+        'Release_date': '',
+        'Stock_quantity': '',
+        'imgLink': 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
+    });
     //詳細資訊
     const showDetails = (product) => {
     selectedProduct.value = product;
@@ -111,10 +153,39 @@
             productResult.value = data;
         });
     };
+    const SetShowAddProductModalTrue = () =>{
+        showAddProductModal.value = true;
+    }
+    const SetShowAddProductModalFalse = () =>{
+        showAddProductModal.value = false;
+    }
     const closeModal = () => {
         showModal.value = false;
     }
+    
+    const saveData = () =>{
+        const page = "http://127.0.0.1:8000/api/products";
+        console.log(addProduct.value);
 
+        axios.post(page, addProduct.value)
+            .then(({ data }) => {
+                alert("新增商品成功");
+                MemberLoad();
+                addProduct.value = {
+                    'Seller_ID': authStore.memberID,
+                    'Product_Name': '',
+                    'Product_Description': '',
+                    'Price': '' ,
+                    'Release_date': '',
+                    'Stock_quantity': '',
+                    'imgLink': 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
+                };
+            })
+        .catch(error => {
+            alert("無法儲存資料");
+        });
+        showAddProductModal.value = false;
+    }
     // 加載商店訂單
     const OrdersLoad = () => {
         const page = "http://127.0.0.1:8000/api/orders/" + authStore.memberID;
@@ -270,4 +341,27 @@ button:hover {
     height: auto;
 }
 
+.form-group {
+  margin-bottom: 10px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.member-form form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
 </style>
