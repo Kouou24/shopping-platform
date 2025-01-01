@@ -6,6 +6,7 @@
         </div>
         <div v-if="member.Member_ID === authStore.memberID && sellerResult.some(item => item.Member_ID === authStore.memberID)">
             <p>你好 {{ member.Nickname }} 賣家</p>
+            <SellerView/>
         </div>
     </div>
 </template>
@@ -15,7 +16,7 @@ import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import axios from 'axios';
 import ClientView from '../components/MyAccountComponents/ClientView.vue';
-
+import SellerView from '../components/MyAccountComponents/SellerView.vue';
 const memberResult = ref([]);
 const sellerResult = ref([]);
 const authStore = useAuthStore();

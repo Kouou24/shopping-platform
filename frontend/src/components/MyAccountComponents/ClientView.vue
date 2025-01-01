@@ -9,14 +9,7 @@
         </div>
 
         <div class="content">
-            <div v-for="member in memberResult">
-                <div v-if="currentSection === 'info'">
-                    <h3>我的資訊</h3>
-                    <p>名稱: {{ member.Nickname }}</p>
-                    <p>電子郵件: {{ member.Email }}</p>
-                    <p>地址: {{ member.Address }}</p>
-                </div>
-            </div>
+           
 
             <div v-if="currentSection === 'orders'" class="order-container">
                 <div class="order-list">

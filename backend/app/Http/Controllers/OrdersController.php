@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 class OrdersController extends Controller
 {
     public function index(){
-        return DB::select('SELECT * FROM oreders');
+        return DB::select('SELECT * FROM orders');
     }
 
     public function store(Request $request)
