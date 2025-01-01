@@ -11,13 +11,13 @@ quantity<template>
             <h3 class="cart-item-name">{{ item.Product_Name }}</h3>
             <p>單價：${{ item.Price }}</p>
             <div class="quantity-control">
-              <button @click="updateQuantity(item.Product_ID, -1)" :disabled="item.Stock_quantity === 1">-</button>
-              <span>{{ item.Stock_quantity }}</span>
-              <button @click="updateQuantity(item.Product_ID, 1)">+</button>
+              <button @click="updateQuantity(item.Product_ID, -1)" :disabled="item.currentStockQuantity === 1">-</button>
+              <span>{{ item.currentStockQuantity }}</span>
+              <button @click="updateQuantity(item.Product_ID, 1)" :disabled="item.currentStockQuantity === item.Stock_quantity">+</button>
             </div>
           </div>
           <div class="cart-item-actions">
-            <p>小計：${{ (item.Price * item.Stock_quantity).toFixed(2) }}</p>
+            <p>小計：${{ (item.Price * item.currentStockQuantity).toFixed(2) }}</p>
             <button class="remove-item" @click="removeItem(item.Product_ID)">刪除</button>
           </div>
         </div>
@@ -42,12 +42,13 @@ quantity<template>
   const authStore = useAuthStore();
   
   const cartItems = ref([]);
-  
   const ProductLoad = async () => {
     const loadedItems = [];
     for (const id of authStore.shoppingCartList) {
       try {
         const { data } = await axios.get("http://127.0.0.1:8000/api/products/" + id);
+        console.log(data[0]);
+        data[0].currentStockQuantity = 1;
         loadedItems.push(data[0]);
         console.log("商品已加載:", data);
       } catch (error) {
@@ -60,19 +61,22 @@ quantity<template>
 
   const totalPrice = computed(() => {
     return cartItems.value
-      .reduce((total, item) => total + item.Price * item.Stock_quantity, 0)
+      .reduce((total, item) => total + item.Price * item.currentStockQuantity, 0)
       .toFixed(2);
   });
   
   const updateQuantity = (id, delta) => {
     const item = cartItems.value.find((item) => item.Product_ID === id);
     if (item) {
-      item.Stock_quantity += delta;
+      item.currentStockQuantity += delta;
+      console.log(item);
     }
   };
   
   const removeItem = (id) => {
+    console.log(id);
     cartItems.value = cartItems.value.filter((item) => item.Product_ID !== id);
+    authStore.removeShoppingCartListById(id);
   };
   
   const checkout = () => {

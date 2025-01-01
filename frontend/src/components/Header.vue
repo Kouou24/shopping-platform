@@ -24,6 +24,7 @@ const authStore = useAuthStore();
 
 const handleLogout = () =>{
   authStore.logout()
+  authStore.removeAllShoppingCart()
 };
 </script>
 

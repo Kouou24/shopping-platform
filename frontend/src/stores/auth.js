@@ -14,7 +14,6 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.isLoggedIn = false;
       this.memberID = null; // 登出時清除 memberID
-      this.addShopingCartList = [];
     },
     setMemberID(memberID) {
       this.memberID = memberID; // 設定 memberID
@@ -23,5 +22,14 @@ export const useAuthStore = defineStore('auth', {
       this.shoppingCartList.push(productID);
       this.shoppingCartList.sort((a, b) => a - b);
     },
+    removeShoppingCartListById(productID){
+      this.shoppingCartList = this.shoppingCartList.filter(item => item !== productID);
+      console.log(this.shoppingCartList);
+    },
+    removeAllShoppingCart(){
+      while(this.shoppingCartList.length){
+        this.shoppingCartList.pop();
+      }
+    }
   },
 });

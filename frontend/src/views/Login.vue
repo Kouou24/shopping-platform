@@ -132,7 +132,6 @@ const handleLogin = () => {
 
     // 設定 memberID 到 authStore
     authStore.setMemberID(loggedInMember.Member_ID);
-
     // 設定登入狀態
     authStore.login();
     router.push('/');
