@@ -108,6 +108,10 @@
                 <label for="address">商品庫存:</label>
                 <input v-model="addProduct.Stock_quantity" type="text" id="address" required />
             </div>
+            <div class="form-group">
+                <label for="address">商品圖片:</label>
+                <input v-model="addProduct.imgLink" type="text" id="address" required />
+            </div>
             <button type="submit" @click="saveData">確認</button>
             <button @click="SetShowAddProductModalFalse">取消</button>
         </form>
