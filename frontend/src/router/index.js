@@ -8,6 +8,7 @@ import Register from '../views/Register.vue';
 import Login from '../views/Login.vue';
 import MyAccount from '../views/MyAccount.vue';
 import Shoppingcart from '../views/Shopping_cart.vue';
+import Checkout from '../views/Checkout.vue';
 
 
 const routes = [
@@ -20,6 +21,7 @@ const routes = [
   { path: '/login', name: 'Login', component: Login },
   { path: '/myaccount', name: 'MyAccount', component: MyAccount },
   { path: '/shopping_cart', name: 'Shoppingcart', component: Shoppingcart },
+  { path: '/checkout', name: 'Checkout', component: Checkout },
 ];
 
 const router = createRouter({

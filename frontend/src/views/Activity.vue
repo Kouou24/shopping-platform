@@ -21,7 +21,6 @@
                             <span class="original-price">${{ product.originalPrice }}</span>
                             <span class="discount-price">${{ product.discountPrice }}</span>
                         </p>
-                        <button class="add-to-cart" @click="addToCart(product)">加入購物車</button>
                     </div>
                 </div>
             </div>

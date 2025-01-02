@@ -29,11 +29,11 @@ quantity<template>
   
       <footer v-if="cartItems.length" class="cart-footer">
         <div class="total-price">總計：${{ totalPrice }}</div>
-        <button class="checkout-button" @click="checkout">前往結帳</button>
+        <router-link to="/checkout"><button class="checkout-button" @click="checkout">前往結帳</button></router-link>
       </footer>
     </div>
   </template>
-  
+
   <script setup>
   import { ref, computed, onMounted } from 'vue';
   import { useAuthStore } from '../stores/auth';

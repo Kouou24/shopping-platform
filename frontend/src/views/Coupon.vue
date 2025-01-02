@@ -1,11 +1,5 @@
 <template>
+    <h1>coupon</h1>
+  </template>
 
-</template>
-
-<script>
-
-</script>
-
-<style>
-
-</style>
+  

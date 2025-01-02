@@ -1,18 +1,6 @@
 <template>
-    <h2>JB購物商場</h2>
-
     <!-- 篩選欄 -->
     <div class="filters">
-        <!-- 商品分類選項 -->
-        <div class="category-filters">
-            <h3>商品分類</h3>
-            <button>電子產品</button>
-            <button>服飾</button>
-            <button>居家生活</button>
-            <button>美妝保養</button>
-            <button>更多...</button>
-        </div>
-
         <!-- 排序條件 -->
         <div class="sort-filters">
             <h3>排序條件</h3>
@@ -182,11 +170,10 @@ onMounted(() => {
 
 /* 商品列表外框 */
 .product-list {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 20px;
-    justify-content: space-between;
-    margin-bottom: 40px;
+    justify-content: center;
 }
 
 /* 單個商品樣式 */

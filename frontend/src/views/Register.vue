@@ -71,6 +71,20 @@
           <input v-model="member.Address" type="e-mail" id="address" />
           <p>{{ member.Address }}</p>
         </div>
+        <div class="form-group">
+          <label>選擇身份:</label>
+          <div class="role-selector">
+            <label>
+              買家
+              <input type="radio" value="買家" v-model="member.Role" />
+            </label>
+            <label>
+              賣家
+              <input type="radio" value="賣家" v-model="member.Role" />
+            </label>
+          </div>
+        </div>
+
         <button type="submit" @click="saveData">註冊</button>
       </form>
     </div>
@@ -279,4 +293,22 @@ button:hover {
 .member-form button:hover {
   background-color: #45a049;
 }
+
+.role-selector {
+  display:flex;
+  gap: 20px; /* 控制每個選項之間的間距 */
+  margin-top: 10px;
+}
+
+.role-selector label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.role-selector input[type="radio"] {
+  margin-left: 10px; /* 按鈕與文字的間距 */
+  cursor: pointer;
+}
+
 </style>
