@@ -47,10 +47,16 @@ quantity<template>
     for (const id of authStore.shoppingCartList) {
       try {
         const { data } = await axios.get("http://127.0.0.1:8000/api/products/" + id);
-        console.log(data[0]);
-        data[0].currentStockQuantity = 1;
-        loadedItems.push(data[0]);
-        console.log("商品已加載:", data);
+        if(loadedItems.some(item => item.Product_ID === data[0].Product_ID))
+        {
+          const item = loadedItems.find(item => item.Product_ID === data[0].Product_ID)
+          item.currentStockQuantity += 1;
+        }
+        else
+        {
+          data[0].currentStockQuantity = 1;
+          loadedItems.push(data[0]);
+        }
       } catch (error) {
         console.error("Error loading product with id:", id, error);
       }
