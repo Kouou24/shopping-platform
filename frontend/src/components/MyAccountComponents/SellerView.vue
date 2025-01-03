@@ -10,7 +10,7 @@
         <div class="content">
            
             <div v-if="currentSection === 'info'">
-                <button @click="SetShowAddProductModalTrue">新增商品</button>
+                <button @click="SetShowAddProductModalTrue();setModify(false)">新增商品</button>
             </div >
            <div v-for="product in productResult">
                 <div v-if="currentSection === 'info'">
@@ -44,8 +44,9 @@
             <p>價格：${{ selectedProduct.Price }}</p>
             <p>數量：{{ selectedProduct.Stock_quantity }}</p>
             <p>發佈日期：{{ selectedProduct.Release_date }}</p>
-            <p>賣家：{{ selectedProduct.Seller_ID }}</p>
             <button @click="closeModal">關閉</button>
+            <button @click="SetShowAddProductModalTrue();setModify(true)">修改</button>
+            <button @click="deleteProduct(selectedProduct.Product_ID)">刪除</button>
         </div>
     </div>
     <div v-if="showAddProductModal" class="modal-overlay">
@@ -53,30 +54,41 @@
         <form @submit.prevent="save">
             <div class="form-field">
                 <label for="product-name">商品名稱:</label>
-                <input v-model="addProduct.Product_Name" type="text" id="product-name" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Product_Name" type="text" id="product-name" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Product_Name" type="text" id="product-name" required />   
             </div>
             <div class="form-field">
                 <label for="product-description">商品描述:</label>
-                <input v-model="addProduct.Product_Description" type="text" id="product-description" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Product_Description" type="text" id="product-description" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Product_Description" type="text" id="product-description" required />
             </div>
             <div class="form-field">
                 <label for="product-price">商品價格:</label>
-                <input v-model="addProduct.Price" type="text" id="product-price" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Price" type="text" id="product-price" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Price" type="text" id="product-price" required />
             </div>
             <div class="form-field">
                 <label for="release-date">商品出售日期:</label>
-                <input v-model="addProduct.Release_date" type="date" id="release-date" class="date-input"  required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Release_date" type="date" id="release-date" class="date-input"  required />
+                <input v-if="!modifyProduct" v-model="addProduct.Release_date" type="date" id="release-date" class="date-input"  required />
             </div>
             <div class="form-field">
                 <label for="stock-quantity">商品庫存:</label>
-                <input v-model="addProduct.Stock_quantity" type="text" id="stock-quantity" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Stock_quantity" type="text" id="stock-quantity" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Stock_quantity" type="text" id="stock-quantity" required />
             </div>
             <div class="form-field">
                 <label for="product-image">商品圖片:</label>
-                <input v-model="addProduct.imgLink" type="text" id="product-image" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.imgLink" type="text" id="product-image" required />
+                <input v-if="!modifyProduct" v-model="addProduct.imgLink" type="text" id="product-image" required />
             </div>
             <div class="form-buttons">
+                <div v-if="modifyProduct">
+                <button type="submit" @click="modifyData(selectedProduct.Product_ID)">確認</button>
+                </div>
+                <div v-else>
                 <button type="submit" @click="saveData">確認</button>
+                </div>
                 <button type="button" class="cancel-button" @click="SetShowAddProductModalFalse">取消</button>
             </div>
         </form>
@@ -94,8 +106,10 @@
     const productResult = ref([]);
     const orderResult = ref([]);
     const selectedProduct = ref({});
+    const modifySelectedProduct = ref({});
     const showModal = ref(false);
     const showAddProductModal = ref(false);
+    const modifyProduct = ref(false);
     const productNum = 0;
     const addProduct = ref({
         'Seller_ID': authStore.memberID,
@@ -123,15 +137,23 @@
             productResult.value = data;
         });
     };
+
+    const setModify = (type) =>{
+        if(type===true){
+            modifySelectedProduct.value = Object.assign({}, selectedProduct.value);
+        }
+        modifyProduct.value = type;
+    };
     const SetShowAddProductModalTrue = () =>{
         showAddProductModal.value = true;
-    }
+    };
     const SetShowAddProductModalFalse = () =>{
         showAddProductModal.value = false;
-    }
+    };
     const closeModal = () => {
         showModal.value = false;
-    }
+        modifySelectedProduct.value = Object.assign({}, selectedProduct.value);
+    };
     
     const saveData = () =>{
         const page = "http://127.0.0.1:8000/api/products";
@@ -155,7 +177,32 @@
             alert("無法儲存資料");
         });
         showAddProductModal.value = false;
-    }
+    };
+
+    const modifyData = (id) =>{
+        const page = "http://127.0.0.1:8000/api/products/" + id;
+        axios.put(page,modifySelectedProduct.value).then(()=>{
+            alert("修改資料成功");
+            MemberLoad();
+            showAddProductModal.value = false;
+            closeModal();
+        })
+        .catch(error => {
+            alert("無法修改資料，請檢查網路或伺服器設定");
+        });
+    };
+
+    const deleteProduct = (id) =>{
+        const page = "http://127.0.0.1:8000/api/products/" + id;
+        axios.delete(page).then(()=>{
+            alert("刪除商品成功");
+            MemberLoad();
+            showModal.value = false;
+        })
+        .catch(error =>{
+            alert("無法刪除資料，請檢查網路或伺服器設定");
+        });
+    };
     // 加載商店訂單
     const OrdersLoad = () => {
         const page = "http://127.0.0.1:8000/api/orders/" + authStore.memberID;

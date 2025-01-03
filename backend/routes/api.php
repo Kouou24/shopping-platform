@@ -32,7 +32,8 @@ Route::get('/products/{id}', [ProductController::class, 'show']);
 Route::put('/products/{id}', [ProductController::class, 'update']); 
 Route::delete('/products/{id}', [ProductController::class, 'destroy']); 
 
-Route::apiResource('/seller', SellerController::class);
+Route::get('/seller', [SellerController::class, 'index']);
+Route::post('/seller', [SellerController::class, 'store']);
 Route::get('/seller/products/{id}', [SellersProductController::class, 'show']);
 
 // Route::apiResource('/member', MemberController::class);
@@ -42,7 +43,8 @@ Route::get('/members/{id}', [MemberController::class, 'show']);
 Route::put('/members/{id}', [MemberController::class, 'update']); 
 Route::delete('/members/{id}', [MemberController::class, 'destroy']); 
 
-Route::apiResource('/customer', CustomerController::class);
+Route::get('/customer', [CustomerController::class, 'index']);
+Route::post('/customer', [CustomerController::class, 'store']);
 
 Route::apiResource('/administrator', AdministratorController::class);
 

@@ -10,6 +10,7 @@ class Sellers extends Model
     use HasFactory;
 
     protected $fillable = [
+        'Member_ID',
         'Seller_description',
     ];
 }

@@ -65,6 +65,7 @@
             MemberLoad();
         })
         .catch(error => {
+            console.log(error);
             alert("無法刪除資料，請檢查網路或伺服器設定");
         });
     };

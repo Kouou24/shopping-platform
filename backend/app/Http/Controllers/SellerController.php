@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Sellers;
+use Illuminate\Support\Facades\DB;
+
 
 class SellerController extends Controller
 {
@@ -26,7 +28,15 @@ class SellerController extends Controller
      */
     public function store(Request $request)
     {
-        return $this->sellers->create($request->all());
+        $result = DB::insert(
+            'INSERT INTO sellers (Member_ID, Seller_description)
+             VALUES(?, ?)',
+             [
+                $request->Member_ID,
+                $request->Seller_description,
+             ]
+        );
+        return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
 
     /**
