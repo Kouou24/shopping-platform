@@ -63,3 +63,5 @@ Route::delete('/orders/{id}', [OrdersController::class, 'destroy']);
 Route::get('/belongto', [BelongToController::class, 'index']);
 Route::post('/belongto', [BelongToController::class, 'store']);
 Route::get('/products/orders/{id}', [BelongToController::class, 'show']);
+Route::put('/belongto', [BelongToController::class, 'update']);
+Route::delete('/belongto', [BelongToController::class, 'destroy']);

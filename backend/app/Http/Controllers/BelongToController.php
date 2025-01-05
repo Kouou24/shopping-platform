@@ -34,4 +34,29 @@ class BelongToController extends Controller
     {
         return DB::select('SELECT * FROM Belong_to WHERE Order_ID = ?', [$id]);
     }
+
+    public function update(Request $request)
+    {
+        $result = DB::update('UPDATE Belong_to 
+                            SET Order_Status = ?
+                            WHERE Product_ID = ? AND Order_ID = ?',
+                            [
+                                $request->Order_Status,
+                                $request->Product_ID,
+                                $request->Order_ID,
+                            ]
+                );
+    }
+
+    public function destroy(Request $request)
+    {
+        $result = DB::delete('DELETE FROM Belong_to 
+                              WHERE Product_ID = ? AND Order_ID = ?',
+                              [
+                                $request -> query('Product_ID'),
+                                $request -> query('Order_ID'),
+                              ]
+                            );
+        return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
+    }
 }
