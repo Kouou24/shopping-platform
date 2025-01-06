@@ -76,7 +76,7 @@
           <div class="role-selector">
             <label>
               買家
-              <input type="radio" value="買家" v-model="member.Role" />
+              <input type="radio" value="買家" v-model="member.Role" checked/>
             </label>
             <label>
               賣家
@@ -115,10 +115,11 @@ const member = ref({
   Address: '',
   created_at: '',
   updated_at: '',
+  Role:'買家',
 });
 const inDB = ref(false);
 const selectedMember = ref({});
-
+const lastID = ref();
 // 預設載入會員資料
 const MemberLoad = () => {
   const page = "http://127.0.0.1:8000/api/members";
@@ -133,24 +134,40 @@ const saveData = () => {
     .then(({ data }) => {
       alert("註冊成功");
       MemberLoad(); // 重新載入資料
-      member.value = { // 重置 member
-        Member_ID: '',
-        Nickname: '',
-        User_Account: '',
-        User_Password: '',
-        Email: '',
-        Address: '',
-        created_at: '',
-        updated_at: '',
-      };
+      if(member.value.Role == "賣家"){
+        sellerSave();
+      }
+      else{
+        customerSave();
+      }
+      resetMember();
     })
     .catch(error => {
       console.error("Error saving data:", error.response ? error.response.data : error.message);
       alert("無法儲存資料，請檢查網路或伺服器設定");
     });
+   
 };
 
+const sellerSave = () =>{
+  const lastID=ref({Member_ID:'', Seller_description:'商家'});
+  const insertPage = "http://127.0.0.1:8000/api/seller/" ;
+  const page = "http://127.0.0.1:8000/api/members";
+  axios.get(page).then(({data})=>{
+    lastID.value.Member_ID=data.at(-1).Member_ID;
+    axios.post(insertPage, lastID.value)
+  });
+};
 
+const customerSave = () =>{
+  const lastID=ref({Member_ID:''});
+  const insertPage = "http://127.0.0.1:8000/api/customer/" ;
+  const page = "http://127.0.0.1:8000/api/members";
+  axios.get(page).then(({data})=>{
+    lastID.value.Member_ID=data.at(-1).Member_ID;
+    axios.post(insertPage, lastID.value)
+  });
+};
 
 // 登入帳號顯示會員資料
 const loginAccount = (selected) => {
@@ -174,7 +191,9 @@ const resetMember = () => {
     address: '',
     created_at: '',
     updated_at: '',
+    Role:'買家',
   };
+  lastID.value = null;
 };
 
 const handleRegister = () => {

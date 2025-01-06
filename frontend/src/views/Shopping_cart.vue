@@ -77,6 +77,13 @@ quantity<template>
       item.currentStockQuantity += delta;
       console.log(item);
     }
+    if(delta > 0){
+      authStore.addShopingCartList(id);
+    }
+    else{
+      authStore.removeOneShoppingCartItem(id);
+      console.log(id);
+    }
   };
   
   const removeItem = (id) => {
@@ -86,7 +93,7 @@ quantity<template>
   };
   
   const checkout = () => {
-    alert("前往結帳，總計金額：$" + totalPrice.value);
+    authStore.setMoney(totalPrice.value);  
     // 這裡可以添加跳轉到結帳頁面的邏輯
   };
 

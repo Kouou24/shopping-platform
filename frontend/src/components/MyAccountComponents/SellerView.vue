@@ -3,6 +3,7 @@
         <div class="sidebar">
         <ul>
             <li @click="showSection('info')" :class="{ active: currentSection === 'info' }">我的商店</li>
+            <li @click="showSection('orders')" :class="{active: currentSection === 'orders'}">訂單管理</li>
             <li @click="showSection('settings')" :class="{ active: currentSection === 'settings' }">帳號設定</li>
         </ul>
         </div>
@@ -10,7 +11,7 @@
         <div class="content">
            
             <div v-if="currentSection === 'info'">
-                <button @click="SetShowAddProductModalTrue">新增商品</button>
+                <button @click="SetShowAddProductModalTrue();setModify(false)">新增商品</button>
             </div >
            <div v-for="product in productResult">
                 <div v-if="currentSection === 'info'">
@@ -28,7 +29,48 @@
                 </div>
             </div>
             
-
+            <div v-if="currentSection === 'orders'">
+                <table>
+                <thead>
+                <tr>
+                    <th>訂單編號</th>
+                    <th>商品編號</th>
+                    <th>商品名稱</th>
+                    <th>訂購數量</th>
+                    <th>商品單價</th>
+                    <th>配送狀態</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="order in orderResult" :key="orderResult.Order_ID">
+                    <td>{{ order.Order_ID }}</td>
+                    <td>{{ order.Product_ID }}</td>
+                    <td>{{ order.Product_Name }}</td>
+                    <td>{{ order.Quantity }}</td>
+                    <td>{{ order.Price }}</td>
+                    <td>
+                        <p v-if="!order.isOrderModify">{{ order.Order_Status }}</p>
+                        <select v-if="order.isOrderModify" v-model="order.new_Status">
+                            <option>{{ order.new_Status }}</option>
+                            <option v-if="order.new_Status!=='received'" value="received">received</option>
+                            <option v-if="order.new_Status!=='processing'" value="processing">processing</option>
+                            <option v-if="order.new_Status!=='shipping'" value="shipping">shipping</option>
+                            <option v-if="order.new_Status!=='completed'" value="completed">completed</option>
+                        </select>
+                    </td>
+                    <td>
+                    <div v-if="order.Order_Status !== 'completed'">
+                        <button v-if="!order.isOrderModify" @click="setOrderModify(order, true)">修改配送狀態</button>
+                        <button v-if="order.isOrderModify" @click="setOrderModify(order, false);changeOrderStatus(order,order.new_Status)">確定</button>
+                        <button v-if="!order.isOrderModify" @click="deleteOrder(order)">取消訂單</button>
+                        <button v-if="order.isOrderModify" @click="setOrderModify(order, false)">取消修改</button>
+                    </div>
+                    </td>
+                </tr>
+                </tbody>
+                </table>
+            </div>
             <div v-if="currentSection === 'settings'">
                 <h3>帳號設定</h3>
                 <button @click="logout">登出</button>
@@ -44,8 +86,9 @@
             <p>價格：${{ selectedProduct.Price }}</p>
             <p>數量：{{ selectedProduct.Stock_quantity }}</p>
             <p>發佈日期：{{ selectedProduct.Release_date }}</p>
-            <p>賣家：{{ selectedProduct.Seller_ID }}</p>
             <button @click="closeModal">關閉</button>
+            <button @click="SetShowAddProductModalTrue();setModify(true)">修改</button>
+            <button @click="deleteProduct(selectedProduct.Product_ID)">刪除</button>
         </div>
     </div>
     <div v-if="showAddProductModal" class="modal-overlay">
@@ -53,30 +96,41 @@
         <form @submit.prevent="save">
             <div class="form-field">
                 <label for="product-name">商品名稱:</label>
-                <input v-model="addProduct.Product_Name" type="text" id="product-name" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Product_Name" type="text" id="product-name" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Product_Name" type="text" id="product-name" required />   
             </div>
             <div class="form-field">
                 <label for="product-description">商品描述:</label>
-                <input v-model="addProduct.Product_Description" type="text" id="product-description" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Product_Description" type="text" id="product-description" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Product_Description" type="text" id="product-description" required />
             </div>
             <div class="form-field">
                 <label for="product-price">商品價格:</label>
-                <input v-model="addProduct.Price" type="text" id="product-price" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Price" type="text" id="product-price" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Price" type="text" id="product-price" required />
             </div>
             <div class="form-field">
                 <label for="release-date">商品出售日期:</label>
-                <input v-model="addProduct.Release_date" type="date" id="release-date" class="date-input"  required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Release_date" type="date" id="release-date" class="date-input"  required />
+                <input v-if="!modifyProduct" v-model="addProduct.Release_date" type="date" id="release-date" class="date-input"  required />
             </div>
             <div class="form-field">
                 <label for="stock-quantity">商品庫存:</label>
-                <input v-model="addProduct.Stock_quantity" type="text" id="stock-quantity" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.Stock_quantity" type="text" id="stock-quantity" required />
+                <input v-if="!modifyProduct" v-model="addProduct.Stock_quantity" type="text" id="stock-quantity" required />
             </div>
             <div class="form-field">
                 <label for="product-image">商品圖片:</label>
-                <input v-model="addProduct.imgLink" type="text" id="product-image" required />
+                <input v-if="modifyProduct" v-model="modifySelectedProduct.imgLink" type="text" id="product-image" required />
+                <input v-if="!modifyProduct" v-model="addProduct.imgLink" type="text" id="product-image" required />
             </div>
             <div class="form-buttons">
+                <div v-if="modifyProduct">
+                <button type="submit" @click="modifyData(selectedProduct.Product_ID)">確認</button>
+                </div>
+                <div v-else>
                 <button type="submit" @click="saveData">確認</button>
+                </div>
                 <button type="button" class="cancel-button" @click="SetShowAddProductModalFalse">取消</button>
             </div>
         </form>
@@ -94,8 +148,10 @@
     const productResult = ref([]);
     const orderResult = ref([]);
     const selectedProduct = ref({});
+    const modifySelectedProduct = ref({});
     const showModal = ref(false);
     const showAddProductModal = ref(false);
+    const modifyProduct = ref(false);
     const productNum = 0;
     const addProduct = ref({
         'Seller_ID': authStore.memberID,
@@ -115,7 +171,13 @@
     const showSection = (section) => {
     currentSection.value = section;
     };
-
+    const setOrderModify = (order,booleanType) =>{
+        order.isOrderModify = booleanType;
+        if(booleanType == true){
+            order.new_Status = order.Order_Status;
+        }
+    };
+    
     // 加載商店資訊
     const MemberLoad = () => {
         const page = "http://127.0.0.1:8000/api/seller/products/" + authStore.memberID;
@@ -123,16 +185,29 @@
             productResult.value = data;
         });
     };
+
+    const setModify = (type) =>{
+        if(type===true){
+            modifySelectedProduct.value = Object.assign({}, selectedProduct.value);
+        }
+        modifyProduct.value = type;
+    };
     const SetShowAddProductModalTrue = () =>{
         showAddProductModal.value = true;
-    }
+    };
     const SetShowAddProductModalFalse = () =>{
         showAddProductModal.value = false;
-    }
+    };
     const closeModal = () => {
         showModal.value = false;
-    }
-    
+        modifySelectedProduct.value = Object.assign({}, selectedProduct.value);
+    };
+    const changeOrderStatus = (order, status) =>{
+        console.log(status);
+        order.Order_Status = status;
+        const page="http://127.0.0.1:8000/api/belongto"
+        axios.put(page, order);
+    };
     const saveData = () =>{
         const page = "http://127.0.0.1:8000/api/products";
         console.log(addProduct.value);
@@ -155,11 +230,48 @@
             alert("無法儲存資料");
         });
         showAddProductModal.value = false;
-    }
+    };
+
+    const modifyData = (id) =>{
+        const page = "http://127.0.0.1:8000/api/products/" + id;
+        axios.put(page,modifySelectedProduct.value).then(()=>{
+            alert("修改資料成功");
+            MemberLoad();
+            showAddProductModal.value = false;
+            closeModal();
+        })
+        .catch(error => {
+            alert("無法修改資料，請檢查網路或伺服器設定");
+        });
+    };
+    const deleteOrder = (order) =>{
+        const page = `http://127.0.0.1:8000/api/belongto?Product_ID=${order.Product_ID}&Order_ID=${order.Order_ID}`;
+        console.log(page);
+        
+        axios.delete(page).then(()=>{
+            alert("成功刪除訂單");
+            OrdersLoad();
+        });
+    };
+    const deleteProduct = (id) =>{
+        const page = "http://127.0.0.1:8000/api/products/" + id;
+        axios.delete(page).then(()=>{
+            alert("刪除商品成功");
+            MemberLoad();
+            showModal.value = false;
+        })
+        .catch(error =>{
+            alert("無法刪除資料，請檢查網路或伺服器設定");
+        });
+    };
     // 加載商店訂單
     const OrdersLoad = () => {
-        const page = "http://127.0.0.1:8000/api/orders/" + authStore.memberID;
+        const page = "http://127.0.0.1:8000/api/order/products/seller/" + authStore.memberID;
         axios.get(page).then(({ data }) => {
+            const newData = data.map(order =>({
+                ...order,
+                isOrderModify:false,
+            }));
             orderResult.value = data;
         });
     };
@@ -442,5 +554,34 @@ button:hover {
     outline: none;
 }
 
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
+thead {
+    background-color: #f4f4f4;
+}
+
+thead th {
+    padding: 10px;
+    border-bottom: 2px solid #ddd;
+    text-align: left;
+}
+
+tbody tr {
+    border-bottom: 1px solid #ddd;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tbody td {
+    padding: 10px;
+}
+
+tbody tr:hover {
+    background-color: #f1f1f1;
+}
 </style>

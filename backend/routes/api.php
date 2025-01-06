@@ -10,6 +10,7 @@ use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\SellersProductController;
+use App\Http\Controllers\BelongToController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -31,8 +32,11 @@ Route::post('/products', [ProductController::class, 'store']);
 Route::get('/products/{id}', [ProductController::class, 'show']); 
 Route::put('/products/{id}', [ProductController::class, 'update']); 
 Route::delete('/products/{id}', [ProductController::class, 'destroy']); 
+Route::get('/order/products/customer/{id}', [ProductController::class, 'orderProductCustomer']);
+Route::get('/order/products/seller/{id}', [ProductController::class, 'orderProductSeller']);
 
-Route::apiResource('/seller', SellerController::class);
+Route::get('/seller', [SellerController::class, 'index']);
+Route::post('/seller', [SellerController::class, 'store']);
 Route::get('/seller/products/{id}', [SellersProductController::class, 'show']);
 
 // Route::apiResource('/member', MemberController::class);
@@ -42,7 +46,8 @@ Route::get('/members/{id}', [MemberController::class, 'show']);
 Route::put('/members/{id}', [MemberController::class, 'update']); 
 Route::delete('/members/{id}', [MemberController::class, 'destroy']); 
 
-Route::apiResource('/customer', CustomerController::class);
+Route::get('/customer', [CustomerController::class, 'index']);
+Route::post('/customer', [CustomerController::class, 'store']);
 
 Route::apiResource('/administrator', AdministratorController::class);
 
@@ -54,3 +59,9 @@ Route::post('/orders', [OrdersController::class, 'store']);
 Route::get('/orders/{id}', [OrdersController::class, 'show']); 
 Route::put('/orders/{id}', [OrdersController::class, 'update']); 
 Route::delete('/orders/{id}', [OrdersController::class, 'destroy']); 
+
+Route::get('/belongto', [BelongToController::class, 'index']);
+Route::post('/belongto', [BelongToController::class, 'store']);
+Route::get('/products/orders/{id}', [BelongToController::class, 'show']);
+Route::put('/belongto', [BelongToController::class, 'update']);
+Route::delete('/belongto', [BelongToController::class, 'destroy']);

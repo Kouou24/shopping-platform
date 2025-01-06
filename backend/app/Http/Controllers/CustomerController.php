@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Customer;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -18,7 +19,14 @@ class CustomerController extends Controller
 
     public function store(Request $request)
     {
-        return $this->customer->create($request->all());
+        $result = DB::insert(
+            'INSERT INTO customer (Member_ID)
+             VALUES(?)',
+             [
+                $request->Member_ID,
+             ]
+        );
+        return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
 
     /**

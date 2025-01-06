@@ -13,8 +13,8 @@ class Orders extends Model
         'Customer_ID',
         'Coupon_ID',
         'Order_Date',
-        'Order_Status',
         'Paid_Date',
         'Deliver_Address',
+        'TotalPrice',
     ];
 }

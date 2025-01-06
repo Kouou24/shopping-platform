@@ -69,4 +69,18 @@ class ProductController extends Controller
                               WHERE Product_ID = ?',[$id]);
         return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
+
+    public function orderProductCustomer(string $id)
+    {
+        return DB::select('SELECT * FROM products 
+                            JOIN belong_to ON 
+                            products.Product_ID = belong_to.Product_ID
+                            where Order_ID = ?',[$id]);
+    }
+    public function orderProductSeller(string $id)
+    {
+        return DB::select('SELECT p.Product_ID, p.Seller_ID, p.Product_Name, p.Price, blong.Quantity, o.Customer_ID, blong.Order_Status, o.Order_ID
+FROM products as p JOIN belong_to as blong ON p.Product_ID=blong.Product_ID JOIN orders as o ON blong.Order_ID = o.Order_ID 
+where p.Seller_ID=?',[$id]);
+    }
 }
