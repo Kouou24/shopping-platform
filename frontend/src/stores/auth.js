@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
     memberID: null, // 新增 memberID 屬性
     shoppingCartList:[],
     totalMoney:0,
+    shipCost:50,
   }),
   actions: {
     login() {
@@ -22,6 +23,9 @@ export const useAuthStore = defineStore('auth', {
     },
     setMoney(money){
       this.totalMoney = money;
+    },
+    setShipCost(money){
+      this.shipCost = money;
     },
     addShopingCartList(productID){
       this.shoppingCartList.push(productID);

@@ -11,6 +11,8 @@ use App\Http\Controllers\CouponsController;
 use App\Http\Controllers\OrdersController;
 use App\Http\Controllers\SellersProductController;
 use App\Http\Controllers\BelongToController;
+use App\Http\Controllers\HasCouponController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -51,8 +53,11 @@ Route::post('/customer', [CustomerController::class, 'store']);
 
 Route::apiResource('/administrator', AdministratorController::class);
 
-Route::apiResource('/coupons', CouponsController::class);
-
+Route::get('/coupons', [CouponsController::class, 'index']);
+Route::get('/coupons/{id}', [CouponsController::class, 'show']);
+Route::post('/coupons', [CouponsController::class, 'store']);
+Route::put('/coupons/{id}', [CouponsController::class, 'update']);
+Route::delete('/coupons/{id}', [CouponsController::class, 'destroy']);
 // Route::apiResource('/orders', OrdersController::class);
 Route::get('/orders', [OrdersController::class, 'index']); 
 Route::post('/orders', [OrdersController::class, 'store']); 
@@ -65,3 +70,9 @@ Route::post('/belongto', [BelongToController::class, 'store']);
 Route::get('/products/orders/{id}', [BelongToController::class, 'show']);
 Route::put('/belongto', [BelongToController::class, 'update']);
 Route::delete('/belongto', [BelongToController::class, 'destroy']);
+
+Route::get('/hascoupon', [HasCouponController::class, 'index']);
+Route::post('/hascoupon', [HasCouponController::class, 'store']);
+Route::get('/hascoupon/{id}', [HasCouponController::class, 'show']);
+Route::put('/hascoupon', [HasCouponController::class, 'update']);
+Route::delete('/hascoupon', [HasCouponController::class, 'destroy']);

@@ -31,7 +31,39 @@
           <input type="text" v-model="couponCode" placeholder="輸入優惠碼" />
           <button type="button" @click="applyCoupon" style="margin-top: 10px;">使用</button>
         </div>
-  
+        <div>
+          <h3>可用優惠</h3>
+          <table>
+              <thead>
+              <tr>
+                  <th>折扣描述</th>
+                  <th>折扣碼</th>
+                  <th>折扣力度</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="coupon in availableCoupon" :key="coupon.Coupon_ID">
+                  <td>{{ coupon.Coupon_Name }}</td>
+                  <td>{{ coupon.Discount_Code }}</td>
+                  <td>{{ coupon.Discount }}</td>
+              </tr>
+              </tbody>
+          </table>
+        </div>
+        <section class="cart-items-section" v-if="cartItems.length">
+        <div v-for="item in cartItems" :key="item.Product_ID" class="cart-item">
+          <div class="cart-item-info">
+            <p>{{ item.Product_Name }}</p>
+            <p v-if="item.Product_Name !== '運費'">單價：${{ item.Price }}</p>
+          </div>
+          <div class="cart-item-actions">
+            <p v-if="item.Product_Name !== '運費'">數量：{{ item.currentStockQuantity }}</p>
+            <p v-if="item.Product_Name !== '運費'">小計：${{ (item.Price * item.currentStockQuantity).toFixed(2) }}</p>
+            <p v-if="item.Product_Name === '運費'">小計：${{ item.Price.toFixed(2) }}</p>
+          </div>
+        </div>
+        </section>
+
         <div class="total-section">
           <h2>總金額: ${{ totalAmount }}</h2>
         </div>
@@ -52,13 +84,58 @@
   const selectedPaymentMethod = ref('');
   const couponCode=ref('');
   const totalAmount = ref(0);
+  const couponInfo = ref([]);
+  const myCouponInfo = ref([]);
+  const availableCoupon = ref([]);
+  const couponInfoShipping = ref({});
   const order = ref({
     Customer_ID:authStore.memberID,
-    Coupon_ID:null,
     Deliver_Address:'',
     TotalPrice:'',
   });
-
+  
+  const cartItems = ref([]);
+  const ProductLoad = async () => {
+    const loadedItems = [{Product_Name:'運費',Price:0}];
+    for (const id of authStore.shoppingCartList) {
+      try {
+        const { data } = await axios.get("http://127.0.0.1:8000/api/products/" + id);
+        if(loadedItems.some(item => item.Product_ID === data[0].Product_ID))
+        {
+          const item = loadedItems.find(item => item.Product_ID === data[0].Product_ID)
+          item.currentStockQuantity += 1;
+        }
+        else
+        {
+          data[0].currentStockQuantity = 1;
+          loadedItems.push(data[0]);
+        }
+      } catch (error) {
+        console.error("Error loading product with id:", id, error);
+      }
+    }
+    if(totalAmount.value < couponInfoShipping.value.Limit){
+      loadedItems[0].Price = authStore.shipCost;
+      totalAmount.value = (parseFloat(totalAmount.value) + parseFloat(authStore.shipCost)).toFixed(2);
+    }
+    cartItems.value = loadedItems;
+    console.log("所有商品以加載",cartItems.value);
+  };
+  const CouponLoad = () =>{
+      const page = "http://127.0.0.1:8000/api/coupons";
+      axios.get(page).then(({ data }) => {
+          couponInfo.value = data;
+          couponInfoShipping.value= data.find(item => item.Type === 'shipping');
+      });
+  };
+  const myCouponLoad = async () =>{
+      const page = "http://127.0.0.1:8000/api/hascoupon/" + authStore.memberID;
+      axios.get(page).then(({ data }) => {
+          myCouponInfo.value = data;
+          availableCouponLoad();
+          console.log(myCouponInfo.value);
+      });
+  };
   const moneyLoad = () =>{
     totalAmount.value = authStore.totalMoney; 
   };
@@ -69,9 +146,9 @@
     }
     alert("下訂成功，請至我的帳戶查看訂單");
     order.value.TotalPrice = totalAmount.value;
+    console.log(order);
     setOrder();
-    router.push('/');
-    
+    //router.push('/');
   };
   const setOrder  = () =>{
     const page = "http://127.0.0.1:8000/api/orders";
@@ -95,22 +172,55 @@
               Order_Status:'received',
             };
             axios.post(belongtoPage,belongto).then(()=>{
-              console.log(belongto);
             });
         }  
         authStore.removeAllShoppingCart()
       });
   };
+  const seasonCouponLoad = () =>{
+    
+  };
+  const availableCouponLoad = () =>{
+    const couponSeason = myCouponInfo.value.filter(item => item.Type === 'seasoning');
+    const productIncart = myCouponInfo.value.filter(item => cartItems.value.some(cart=>cart.Product_ID===item.Product_ID));
+    const combine=[...couponSeason, ...productIncart];
+    
+    for (const item of combine){
+      const startTime=new Date(item.Start_time);
+      const endTime=new Date(item.End_time);
+      const currentTime=new Date();
+      if(currentTime>=startTime && currentTime<=endTime){
+        availableCoupon.value.push(item);
+      }
+    }
+  };
   const applyCoupon = () =>{
-    if (this.couponCode === 'DISCOUNT10') {
-      this.totalAmount *= 0.9;
-      alert('Coupon applied! 10% discount.');
+    const currentCoupon = availableCoupon.value.find(item=>item.Discount_Code === couponCode.value)
+    console.log(currentCoupon);
+    if (currentCoupon) {
+      if(currentCoupon.Type == 'seasoning'){
+        totalAmount.value = Math.ceil(totalAmount.value * currentCoupon.Discount).toFixed(2);
+        console.log(totalAmount.value);
+      }
+      else{
+        const currentProduct = cartItems.value.find(item=>item.Product_ID === currentCoupon.Product_ID)
+        const diffPrice=currentProduct.Price-Math.ceil(currentProduct.Price * currentCoupon.Discount);
+        currentProduct.Price = currentProduct.Price - diffPrice;
+        totalAmount.value = totalAmount.value - (diffPrice*currentProduct.currentStockQuantity);
+      }
     } else {
       alert('Invalid coupon code.');
     }
   };
+  async function loadAll(){
+    await ProductLoad();
+    await myCouponLoad();
+  }
   onMounted(()=>{
     moneyLoad();
+    CouponLoad();
+    loadAll();
+    
     const page = "http://127.0.0.1:8000/api/members/" + authStore.memberID;
     axios.get(page).then(({data})=>{
       order.value.Deliver_Address = data[0].Address;

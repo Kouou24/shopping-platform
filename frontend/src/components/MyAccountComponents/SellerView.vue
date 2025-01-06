@@ -4,6 +4,7 @@
         <ul>
             <li @click="showSection('info')" :class="{ active: currentSection === 'info' }">我的商店</li>
             <li @click="showSection('orders')" :class="{active: currentSection === 'orders'}">訂單管理</li>
+             <li @click="showSection('coupon')" :class="{ active: currentSection === 'coupon' }">優惠管理</li>
             <li @click="showSection('settings')" :class="{ active: currentSection === 'settings' }">帳號設定</li>
         </ul>
         </div>
@@ -60,12 +61,10 @@
                         </select>
                     </td>
                     <td>
-                    <div v-if="order.Order_Status !== 'completed'">
                         <button v-if="!order.isOrderModify" @click="setOrderModify(order, true)">修改配送狀態</button>
                         <button v-if="order.isOrderModify" @click="setOrderModify(order, false);changeOrderStatus(order,order.new_Status)">確定</button>
-                        <button v-if="!order.isOrderModify" @click="deleteOrder(order)">取消訂單</button>
+                        <button v-if="!order.isOrderModify && order.Order_Status !== 'completed'" @click="deleteOrder(order)">取消訂單</button>
                         <button v-if="order.isOrderModify" @click="setOrderModify(order, false)">取消修改</button>
-                    </div>
                     </td>
                 </tr>
                 </tbody>
@@ -75,7 +74,71 @@
                 <h3>帳號設定</h3>
                 <button @click="logout">登出</button>
             </div>
+
+            <div v-if="currentSection === 'coupon'">
+            <div class="member-list">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>優惠券ID</th>
+                        <th>優惠名稱</th>
+                        <th>優惠碼</th>
+                        <th>商品名稱</th>
+                        <th>折扣力度</th>
+                        <th>起始時間</th>
+                        <th>結束時間</th>
+                        <th>類型</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="coupon in couponInfo" :key="coupon.Coupon_ID">
+                        <td>{{ coupon.Coupon_ID }}</td>
+                        <td>{{ coupon.Coupon_Name }}</td>
+                        <td>{{ coupon.Discount_Code }}</td>
+                        <td>{{ coupon.Product_Name }}</td>
+                        <td>{{ coupon.Discount }}</td>
+                        <td>{{ coupon.Start_time }}</td>
+                        <td>{{ coupon.End_time }}</td>
+                        <td>{{ coupon.Type }}</td>
+                        <td>
+                            <button @click="setDefineCoupon(true);setModifyCoupon(coupon,true)">修改</button>
+                            <button @click="deleteCoupon(coupon.Coupon_ID)">刪除</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
+    </div>
+    <div v-if="defineCoupon || modifyCoupon" class="modal-overlay">
+            <div class="add-product-form">
+            <form @submit.prevent="save">
+                <div class="form-group">
+                <label for="account">優惠名稱:</label>
+                <input v-model="newCoupon.Coupon_Name" type="text" id="account" required />
+                </div>
+                <div class="form-group">
+                <label for="account">優惠碼:</label>
+                <input v-model="newCoupon.Discount_Code" type="text" id="account" required />
+                </div>
+                <div class="form-group">
+                <label for="account">折扣:</label>
+                <input v-model="newCoupon.Discount" type="number" placeholder="0.9" id="account" min="0.1" max="0.99" step="0.05" required />
+                </div>
+                <div class="form-group">
+                <label for="release-date">起始日期:</label>
+                <input v-model="newCoupon.Start_time" type="datetime-local" id="release-date" class="date-input" required />
+                </div>
+                <div class="form-group">
+                <label for="release-date">結束日期:</label>
+                <input v-model="newCoupon.End_time" type="datetime-local" id="release-date" class="date-input" required />
+                </div>
+            <button @click="insertCoupon(newCoupon.Coupon_ID)">確認</button>
+            <button @click="setDefineCoupon(false);setModifyCoupon(false)" class="cancel-button">取消</button>
+            </form>
+            </div>
     </div>
     <!-- 模態框 -->
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
@@ -89,6 +152,7 @@
             <button @click="closeModal">關閉</button>
             <button @click="SetShowAddProductModalTrue();setModify(true)">修改</button>
             <button @click="deleteProduct(selectedProduct.Product_ID)">刪除</button>
+            <button @click="setDefineCoupon(true);setProductCoupon(selectedProduct.Product_ID)">新增優惠</button>
         </div>
     </div>
     <div v-if="showAddProductModal" class="modal-overlay">
@@ -153,6 +217,9 @@
     const showAddProductModal = ref(false);
     const modifyProduct = ref(false);
     const productNum = 0;
+    const defineCoupon = ref(false);
+    const modifyCoupon = ref(false);
+    const couponInfo = ref([]);
     const addProduct = ref({
         'Seller_ID': authStore.memberID,
         'Product_Name': '',
@@ -162,6 +229,79 @@
         'Stock_quantity': '',
         'imgLink': 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
     });
+    const CouponLoad = () =>{
+        const page = "http://127.0.0.1:8000/api/coupons/" + authStore.memberID;
+        axios.get(page).then(({ data }) => {
+            couponInfo.value = data;
+        });
+    };
+    const newCoupon = ref({
+        Coupon_Name: '',
+        Discount: 0.9,
+        Discount_Code: '',
+        End_time: '' ,
+        Limit: '',
+        Member_ID: authStore.memberID,
+        Product_ID: '',
+        Start_time:'',
+        Type: "event",
+    });
+    const setDefineCoupon = (booleanType) =>{
+        defineCoupon.value = booleanType;
+        showModal.value=false;
+    };
+    const setProductCoupon = (id) =>{
+        console.log(id);
+        newCoupon.value.Product_ID = id;
+        console.log(newCoupon);
+    };
+    const setModifyCoupon = (coupon, booleanType) =>{
+        modifyCoupon.value =booleanType;
+        if( booleanType == true){
+            newCoupon.value=JSON.parse(JSON.stringify(coupon));
+        }
+    };
+    const deleteCoupon = (id) =>{
+        const page = "http://127.0.0.1:8000/api/coupons/" + id;
+        axios.delete(page).then(()=>{
+            alert("刪除優惠成功");
+            CouponLoad();
+        });
+    };
+    const insertCoupon = (id) =>{
+        if(!modifyCoupon.value){
+            const page = "http://127.0.0.1:8000/api/coupons";
+            axios.post(page, newCoupon.value).then(()=>{
+                alert('新增優惠 成功');
+                CouponLoad();
+                defineCoupon.value = false;
+                resetNewCoupon();
+            });
+        }
+        else{
+            const page = "http://127.0.0.1:8000/api/coupons/" + id;
+            axios.put(page, newCoupon.value).then(()=>{
+                alert('修改優惠成功');
+                CouponLoad();
+                defineCoupon.value = false;
+                modifyCoupon.value = false;
+                resetNewCoupon();
+            });
+        }
+    };
+    const resetNewCoupon = () =>{
+        newCoupon.value = {
+            Coupon_Name: '',
+            Discount: 0.9,
+            Discount_Code: '',
+            End_time: '' ,
+            Limit: '',
+            Member_ID: authStore.memberID,
+            Product_ID: '',
+            Start_time:'',
+            Type: "event",
+        };
+    };
     //詳細資訊
     const showDetails = (product) => {
     selectedProduct.value = product;
@@ -286,6 +426,7 @@
     onMounted(() => {
     MemberLoad();
     OrdersLoad();
+    CouponLoad();
     });
 </script>
 
