@@ -177,9 +177,7 @@
         authStore.removeAllShoppingCart()
       });
   };
-  const seasonCouponLoad = () =>{
-    
-  };
+
   const availableCouponLoad = () =>{
     const couponSeason = myCouponInfo.value.filter(item => item.Type === 'seasoning');
     const productIncart = myCouponInfo.value.filter(item => cartItems.value.some(cart=>cart.Product_ID===item.Product_ID));
@@ -189,7 +187,7 @@
       const startTime=new Date(item.Start_time);
       const endTime=new Date(item.End_time);
       const currentTime=new Date();
-      if(currentTime>=startTime && currentTime<=endTime){
+      if(currentTime>=startTime && currentTime<=endTime && !item.Used ){
         availableCoupon.value.push(item);
       }
     }
@@ -208,14 +206,24 @@
         currentProduct.Price = currentProduct.Price - diffPrice;
         totalAmount.value = totalAmount.value - (diffPrice*currentProduct.currentStockQuantity);
       }
+      couponUsed(currentCoupon);
     } else {
       alert('Invalid coupon code.');
     }
   };
+
+  const couponUsed = (coupon) => {
+    coupon.Used=true;
+    const page="http://127.0.0.1:8000/api/hascoupon";
+    axios.put(page,coupon).then(()=>{
+      myCouponLoad();
+      availableCoupon.value=[];
+    });
+  };
   async function loadAll(){
     await ProductLoad();
     await myCouponLoad();
-  }
+  };
   onMounted(()=>{
     moneyLoad();
     CouponLoad();

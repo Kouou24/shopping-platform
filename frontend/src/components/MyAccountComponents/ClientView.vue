@@ -65,6 +65,7 @@
                         <th>起始時間</th>
                         <th>結束時間</th>
                         <th>類型</th>
+                        <th>使用</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -78,7 +79,11 @@
                         <td>{{ coupon.End_time }}</td>
                         <td>{{ coupon.Type }}</td>
                         <td>
-                            <button @click="deleteMyCoupon(coupon)">刪除</button>
+                            <p v-if="coupon.Used">已使用</p>
+                            <p v-if="!coupon.Used">尚未使用</p>
+                        </td>
+                        <td>
+                            <button v-if="!coupon.Used" @click="deleteMyCoupon(coupon)">刪除</button>
                         </td>
                     </tr>
                     </tbody>

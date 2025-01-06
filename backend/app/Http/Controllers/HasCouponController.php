@@ -13,11 +13,12 @@ class HasCouponController extends Controller
 
     public function store(Request $request)
     {
-        return DB::insert('INSERT INTO Has_Coupon(Coupon_ID, Customer_ID)
-                            VALUES(?, ?)',
+        return DB::insert('INSERT INTO Has_Coupon(Coupon_ID, Customer_ID, Used)
+                            VALUES(?, ?, ?)',
                             [
                                 $request->Coupon_ID,
                                 $request->Member_ID,
+                                $request->Used,
                             ]);
     }
 
@@ -33,9 +34,18 @@ class HasCouponController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-
+        $result = DB::update(
+            'UPDATE Has_coupon 
+            SET Used = ?
+            WHERE Coupon_ID = ? AND Customer_ID = ?',
+            [
+                $request->Used,
+                $request->Coupon_ID,
+                $request->Customer_ID,
+            ]
+       );
     }
 
     /**

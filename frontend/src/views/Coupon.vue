@@ -46,6 +46,7 @@
   const hascoupon=ref({
     Coupon_ID:'',
     Member_ID:authStore.memberID,
+    Used:false,
   });
   const CouponLoad = () =>{
       const page = "http://127.0.0.1:8000/api/coupons";
