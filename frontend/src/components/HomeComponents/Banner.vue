@@ -33,9 +33,9 @@
     data() {
       return {
         slides: [
-          'https://img1.momoshop.com.tw/ecm/img/online/10/999/00/000/bt_0_247_01/bt_0_247_01_P1_1_e2.jpg',
-          'https://img3.momoshop.com.tw/ecm/img/online/10/999/00/000/bt_0_247_01/bt_0_247_01_P1_6_e2.jpg',
-          'https://img3.momoshop.com.tw/ecm/img/online/10/999/00/000/bt_0_247_01/bt_0_247_01_P1_8_e2.jpg',
+          'https://img.pchome.com.tw/fs/img/h24/v2/layout/sign_new/3c/hero/06773bc3aa43e46773bc3aa442becman1/7_1_20241226104453.jpg',
+          'https://img.pchome.com.tw/fs/img/h24/v2/layout/sign_new/3c/hero/06773bc3aa43e46773bc3aa442becman1/8_1_20241231175130.jpg',
+          'https://img.pchome.com.tw/fs/img/h24/v2/layout/sign_new/3c/hero/06773bc3aa43e46773bc3aa442becman1/10_1_20241202144028.jpg',
         ],
         currentSlide: 0, // 當前顯示的幻燈片索引
         intervalId: null, // 定時器 ID

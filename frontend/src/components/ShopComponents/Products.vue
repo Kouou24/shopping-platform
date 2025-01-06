@@ -74,7 +74,7 @@ const sortedResult = computed(() => {
     } else if (sortOrder.value === 'desc') {
       return b.Price - a.Price;
     } else if (sortOrder.value === 'newest') {
-      return a.Product_ID - b.Product_ID; // 最新上架依 Product_ID 排序
+      return b.Product_ID - a.Product_ID; // 最新上架依 Product_ID 排序
     } else {
       return 0;
     }

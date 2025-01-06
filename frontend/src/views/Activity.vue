@@ -29,6 +29,7 @@
 </template>
 
 <script>
+
 export default {
     data() {
         return {
@@ -78,7 +79,7 @@ export default {
             if (savedEndTime) {
                 this.eventEndTime = parseInt(savedEndTime, 10);
             } else {
-                this.eventEndTime = new Date().getTime() + 72 * 60 * 60 * 1000; // 預設72小時後
+                this.eventEndTime = new Date().getTime() + 3600 * 60 * 60 * 1000; // 預設72小時後
                 localStorage.setItem('eventEndTime', this.eventEndTime);
             }
         },
@@ -96,6 +97,11 @@ export default {
                 this.countdown = "活動已結束";
             }
         },
+        resetCountdown() {
+        this.eventEndTime = new Date().getTime() + 3600 * 60 * 60 * 1000;  // 重置為72小時後
+        localStorage.setItem('eventEndTime', this.eventEndTime);  // 更新 localStorage
+        this.updateCountdown();  // 立即更新倒計時
+    },
         addToCart(product) {
             alert(`已將 ${product.name} 加入購物車！`);
         },
