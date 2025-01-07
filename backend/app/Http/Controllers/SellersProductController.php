@@ -69,6 +69,11 @@ class SellersProductController extends Controller
                               WHERE Product_ID = ?',[$id]);
         return $result ? response()->json(['success' => true]) : response()->json(['success' => false]);
     }
-    
+    public function statics(string $id)
+    {
+        return DB::select('SELECT COUNT(distinct Customer_ID) as customers, SUM(b.Quantity) as products,SUM(o.TotalPrice) as sellerTotal 
+        from belong_to as b JOIN orders as o ON b.Order_ID=o.Order_ID JOIN products as p ON b.Product_ID=p.Product_ID
+        WHERE Seller_ID= ?',[$id]);
+    }
 }
 

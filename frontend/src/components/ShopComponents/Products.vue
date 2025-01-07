@@ -12,6 +12,10 @@
         </div>
     </div>
 
+    <div>
+    <input type="text" v-model="keyword" @keyup.enter ="LoadSearch" placeholder="搜尋商品"/>
+    </div>
+
     <div class="product-list">
         <div v-for="product in sortedResult" v-bind:key="product.Product_ID" class="product-item">
             <img :src="product.imgLink" alt="商品">
@@ -54,7 +58,7 @@ const result = ref([]);
 const sortOrder = ref('asc'); // 預設排序方式
 const showModal = ref(false);
 const selectedProduct = ref({});
-
+const keyword = ref('');
 // 加載產品資料
 const ProductLoad = () => {
   axios.get("http://127.0.0.1:8000/api/products")
@@ -66,6 +70,15 @@ const ProductLoad = () => {
     });
 };
 
+const LoadSearch = () => {
+    const page=`http://127.0.0.1:8000/api/search?Item=${ keyword.value }`;
+    console.log(page);
+
+    axios.get(page)
+    .then(({ data }) => {
+      result.value = data;
+    })
+};
 // 排序後的結果
 const sortedResult = computed(() => {
   return result.value.slice().sort((a, b) => {
@@ -243,5 +256,21 @@ button:hover {
 .model_img {
     width: 100%;
     height: auto;
+}
+input[type="text"] {
+    width: 100%;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    outline: none;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    margin-bottom: 20px;
+}
+
+input[type="text"]:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
 }
 </style>
