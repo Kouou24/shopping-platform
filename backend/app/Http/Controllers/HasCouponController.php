@@ -30,7 +30,6 @@ class HasCouponController extends Controller
         $coupons = DB::select('SELECT * FROM Has_Coupon AS h LEFT JOIN coupons AS c ON c.Coupon_ID=h.Coupon_ID WHERE h.Customer_ID = ?',[$id]);
         return $coupons; 
     }
-
     /**
      * Update the specified resource in storage.
      */
@@ -47,7 +46,6 @@ class HasCouponController extends Controller
             ]
        );
     }
-
     /**
      * Remove the specified resource from storage.
      */

@@ -148,7 +148,7 @@
     order.value.TotalPrice = totalAmount.value;
     console.log(order);
     setOrder();
-    //router.push('/');
+    router.push('/');
   };
   const setOrder  = () =>{
     const page = "http://127.0.0.1:8000/api/orders";

@@ -4,13 +4,20 @@
         <ul>
             <li @click="showSection('info')" :class="{ active: currentSection === 'info' }">我的商店</li>
             <li @click="showSection('orders')" :class="{active: currentSection === 'orders'}">訂單管理</li>
-             <li @click="showSection('coupon')" :class="{ active: currentSection === 'coupon' }">優惠管理</li>
+            <li @click="showSection('coupon')" :class="{ active: currentSection === 'coupon' }">優惠管理</li>
+            <li @click="showSection('statics')" :class="{ active: currentSection === 'statics' }">統計資訊</li>
             <li @click="showSection('settings')" :class="{ active: currentSection === 'settings' }">帳號設定</li>
         </ul>
         </div>
 
         <div class="content">
-           
+           <div v-if="currentSection==='statics'" class="statics-section">
+            <p>已有<strong>{{staticsInfo.customers}}</strong>個不同的人購買您的商品</p>
+            <p v-if="!staticsInfo.products">已售出<strong>0</strong>件商品</p>
+            <p v-if="!staticsInfo.products">訂單已累積<strong>$0元</strong></p>
+            <p v-if="staticsInfo.products">已售出<strong>{{staticsInfo.products}}</strong>件商品</p>
+            <p v-if="staticsInfo.sellerTotal">訂單已累積<strong>${{staticsInfo.sellerTotal}}元</strong></p>
+           </div>
             <div v-if="currentSection === 'info'">
                 <button @click="SetShowAddProductModalTrue();setModify(false)">新增商品</button>
             </div >
@@ -229,6 +236,15 @@
         'Stock_quantity': '',
         'imgLink': 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg',
     });
+
+    const staticsInfo=ref({});
+    const staticsLoad=()=>{
+        const page = "http://127.0.0.1:8000/api/statics/"+ authStore.memberID;
+        axios.get(page).then(({ data }) => {
+            staticsInfo.value = data[0];
+            console.log(staticsInfo.value);
+        });
+    }
     const CouponLoad = () =>{
         const page = "http://127.0.0.1:8000/api/coupons/" + authStore.memberID;
         axios.get(page).then(({ data }) => {
@@ -427,6 +443,7 @@
     MemberLoad();
     OrdersLoad();
     CouponLoad();
+    staticsLoad();
     });
 </script>
 
@@ -724,5 +741,21 @@ tbody td {
 
 tbody tr:hover {
     background-color: #f1f1f1;
+}
+.statics-section {
+    background-color: #f9f9f9; /* 淺灰背景 */
+    border: 2px solid #007bff; /* 藍色邊框 */
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+.statics-section h2 {
+    color: #007bff; /* 藍色標題 */
+    margin-bottom: 15px;
+}
+.statics-section p {
+    font-size: 18px;
+    line-height: 1.5;
+    margin-bottom: 10px;
 }
 </style>

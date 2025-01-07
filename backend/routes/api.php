@@ -76,3 +76,6 @@ Route::post('/hascoupon', [HasCouponController::class, 'store']);
 Route::get('/hascoupon/{id}', [HasCouponController::class, 'show']);
 Route::put('/hascoupon', [HasCouponController::class, 'update']);
 Route::delete('/hascoupon', [HasCouponController::class, 'destroy']);
+
+Route::get('/search', [ProductController::class, 'searchItem']);
+Route::get('/statics/{id}', [SellersProductController::class, 'statics']);

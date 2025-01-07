@@ -83,4 +83,11 @@ class ProductController extends Controller
 FROM products as p JOIN belong_to as blong ON p.Product_ID=blong.Product_ID JOIN orders as o ON blong.Order_ID = o.Order_ID 
 where p.Seller_ID=?',[$id]);
     }
+    public function searchItem(Request $request)
+    {
+        $searchItem = '%' . $request->query('Item') . '%';
+        return DB::select('SELECT * FROM products
+        WHERE Product_Description LIKE ? OR Product_Name LIKE ? ',[$searchItem,$searchItem]);
+    }
+
 }

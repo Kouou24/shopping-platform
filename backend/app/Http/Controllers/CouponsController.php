@@ -30,7 +30,7 @@ class CouponsController extends Controller
                                 $request->End_time,
                                 $request->Type,
                                 $request->Product_ID,
-                            ]);
+                            ]);           
     }
 
     /**
