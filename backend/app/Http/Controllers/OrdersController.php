@@ -14,11 +14,10 @@ class OrdersController extends Controller
     public function store(Request $request)
     {
         $result = DB::insert(
-            'INSERT INTO orders (Customer_ID, Coupon_ID, Deliver_Address, TotalPrice)
-             VALUES (?, ?, ?, ?)',
+            'INSERT INTO orders (Customer_ID, Deliver_Address, TotalPrice)
+             VALUES (?, ?, ?)',
             [
                 $request->Customer_ID,
-                $request->Coupon_ID,
                 $request->Deliver_Address,
                 $request->TotalPrice,
             ]
@@ -41,11 +40,10 @@ class OrdersController extends Controller
     {
         $result = DB::update(
             'UPDATE orders 
-             SET Customer_ID = ?, Coupon_ID = ?, Order_Status = ?, Paid_Date = ?, Deliver_Address = ? 
+             SET Customer_ID = ?, Order_Status = ?, Paid_Date = ?, Deliver_Address = ? 
              WHERE Order_ID = ?',
             [
                 $request->Customer_ID,
-                $request->Coupon_ID,
                 $request->Order_Status,
                 $request->Paid_Date,
                 $request->Deliver_Address

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Coupons;
+use Illuminate\Support\Facades\DB;
 
 class CouponsController extends Controller
 {
@@ -13,12 +14,23 @@ class CouponsController extends Controller
     }
 
     public function index(){
-        return $this->coupons->all();
+        return DB::select('SELECT c.*, p.Product_Name FROM coupons AS c LEFT JOIN products AS p ON c.Product_ID=p.Product_ID');
     }
 
     public function store(Request $request)
     {
-        return $this->coupons->create($request->all());
+        return DB::insert('INSERT INTO coupons(Member_ID, Coupon_Name, Discount_Code, Discount, Start_time, End_time, Type, Product_ID)
+                            VALUES(?, ?, ?, ?, ?, ?, ?, ?)',
+                            [
+                                $request->Member_ID,
+                                $request->Coupon_Name,
+                                $request->Discount_Code,
+                                $request->Discount,
+                                $request->Start_time,
+                                $request->End_time,
+                                $request->Type,
+                                $request->Product_ID,
+                            ]);
     }
 
     /**
@@ -26,7 +38,8 @@ class CouponsController extends Controller
      */
     public function show(string $id)
     {
-        $coupons = $this->coupons->find($id); 
+        $coupons = DB::select('SELECT c.*, p.Product_Name FROM coupons AS c LEFT JOIN products AS p ON c.Product_ID=p.Product_ID WHERE Member_ID = ?',[$id]);
+        return $coupons; 
     }
 
     /**
@@ -34,8 +47,20 @@ class CouponsController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $coupons = $this->coupons->find($id);
-        $coupons->update($request->all());
+        $coupons = DB::update('UPDATE coupons
+                                SET Coupon_Name =?, Discount_Code=?, Discount=?, Start_time=?,End_time=?,Product_ID=?
+                                WHERE Coupon_ID =?',
+                                [
+                                    $request->Coupon_Name,
+                                    $request->Discount_Code,
+                                    $request->Discount,
+                                    $request->Start_time,
+                                    $request->End_time, 
+                                    $request->Product_ID,
+                                    $id   
+                                ]
+                            );
+       
         return $coupons;
     }
 
@@ -44,8 +69,8 @@ class CouponsController extends Controller
      */
     public function destroy(string $id)
     {
-        $coupons = $this->coupons->find($id);
-        return $coupons->delete();
+        $coupons = DB::delete('DELETE FROM coupons WHERE Coupon_ID = ?', [$id]);
+        return $coupons;
     }
 
 }

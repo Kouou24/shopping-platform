@@ -4,6 +4,7 @@
         <ul>
             <li @click="showSection('info')" :class="{ active: currentSection === 'info' }">我的資訊</li>
             <li @click="showSection('orders')" :class="{ active: currentSection === 'orders' }">我的訂單</li>
+            <li @click="showSection('coupon')" :class="{ active: currentSection === 'coupon' }">我的優惠券</li>
             <li @click="showSection('settings')" :class="{ active: currentSection === 'settings' }">帳號設定</li>
         </ul>
         </div>
@@ -52,7 +53,43 @@
                 </li>
                 </ul>
             </div>
-
+            <div v-if="currentSection === 'coupon'">
+            <div class="member-list">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>優惠券ID</th>
+                        <th>優惠名稱</th>
+                        <th>優惠碼</th>
+                        <th>折扣力度</th>
+                        <th>起始時間</th>
+                        <th>結束時間</th>
+                        <th>類型</th>
+                        <th>使用</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="coupon in couponInfo" :key="coupon.Coupon_ID">
+                        <td>{{ coupon.Coupon_ID }}</td>
+                        <td>{{ coupon.Coupon_Name }}</td>
+                        <td>{{ coupon.Discount_Code }}</td>
+                        <td>{{ coupon.Discount }}</td>
+                        <td>{{ coupon.Start_time }}</td>
+                        <td>{{ coupon.End_time }}</td>
+                        <td>{{ coupon.Type }}</td>
+                        <td>
+                            <p v-if="coupon.Used">已使用</p>
+                            <p v-if="!coupon.Used">尚未使用</p>
+                        </td>
+                        <td>
+                            <button v-if="!coupon.Used" @click="deleteMyCoupon(coupon)">刪除</button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
             <div v-if="currentSection === 'settings'">
                 <h3>帳號設定</h3>
                 <button @click="logout">登出</button>
@@ -96,6 +133,14 @@
     const orderResult = ref([]);
     const showModal = ref(false);
     const orderDetails = ref([]);
+    const couponInfo = ref([]);
+    
+    const CouponLoad = () =>{
+        const page = "http://127.0.0.1:8000/api/hascoupon/" + authStore.memberID;
+        axios.get(page).then(({ data }) => {
+            couponInfo.value = data;
+        });
+    };
     const setShowModal = (booleanType) =>{
         showModal.value = booleanType;
     };
@@ -134,6 +179,13 @@
             OrdersLoad();
         });
     };
+    const deleteMyCoupon = (coupon) =>{
+        console.log(coupon);
+        const page = `http://127.0.0.1:8000/api/hascoupon/?Coupon_ID=${coupon.Coupon_ID}&Customer_ID=${coupon.Customer_ID}`;
+        axios.delete(page).then(()=>{
+            CouponLoad();
+        });
+    };
     // 登出功能
     const logout = () => {
     authStore.logout();
@@ -144,6 +196,7 @@
     onMounted(() => {
     MemberLoad();
     OrdersLoad();
+    CouponLoad();
     });
 </script>
 
